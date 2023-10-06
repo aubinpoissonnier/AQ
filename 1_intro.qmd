@@ -220,6 +220,8 @@ Enfin, notons qu'on peut accéder à un élément particulier d'un vecteur en fa
 
 ```{r}
 diplome[2]
+diplome[1]
+diplome[4]
 ```
 
 Cette opération, qui utilise l'opérateur `[]`, permet donc la sélection d'éléments d'un vecteur.
@@ -329,7 +331,7 @@ En effet, R considère par défaut qu'il ne peut pas calculer la moyenne si une 
 On peut cependant indiquer à `mean` d'effectuer le calcul en ignorant les valeurs manquantes. Ceci se fait en ajoutant un argument supplémentaire, nommé `na.rm` (abbréviation de *NA remove*, "enlever les NA"), et de lui attribuer la valeur `TRUE` (code interne de R signifiant *vrai*).
 
 ```{r}
-mean(tailles, na.rm = TRUE)
+mean(x = tailles, na.rm = TRUE)
 ```
 
 Positionner le paramètre `na.rm` à `TRUE` indique à la fonction `mean` de ne pas tenir compte des valeurs manquantes dans le calcul.
@@ -432,13 +434,14 @@ Si vous essayez d'exécuter une fonction d'une extension et que vous obtenez le 
 Construire un vecteur `x` qui contient les valeurs 120, 134, 256, 12
 
 ```{r}
-
+x <- c(120, 134, 256, 12)
 ```
 
 Utiliser ce vecteur `x` pour générer les deux vecteurs `c(220, 234, 356, 112)` et `c(240, 268, 512, 24)`
 
 ```{r}
-
+x + 100
+x * 2
 ```
 
 **Exercice 2**
@@ -456,6 +459,12 @@ Calculer le revenu total de chaque ménage, puis diviser par le nombre de person
 
 ```{r}
 # Réponse
+conjoint1 + conjoint2
+
+(conjoint1 + conjoint2) / 2
+
+rev_men <- conjoint1 + conjoint2
+rev_men/2
 ```
 
 **Exercice 3**
@@ -467,6 +476,10 @@ Dans l'exercice précédent, calculer le revenu minimum et maximum parmi ceux du
 conjoint1 <- c(1200, 1180, 1750, 2100)
 
 # Réponse
+min(conjoint1)
+max(conjoint1)
+
+range(conjoint1)
 ```
 
 Recommencer avec les revenus suivants, parmi lesquels l'un des enquetés n'a pas voulu répondre :
@@ -476,6 +489,7 @@ Recommencer avec les revenus suivants, parmi lesquels l'un des enquetés n'a pas
 conjoint1 <- c(1200, 1180, 1750, NA)
 
 # Réponse
+min(conjoint1, na.rm = T)
 ```
 
 **Exercice 4**
@@ -492,18 +506,20 @@ Calculer la température moyenne sur l'année.
 
 ```{r}
 # Réponse
+mean(temperature)
 ```
 
 Calculer la quantité totale de précipitations sur l'année.
 
 ```{r}
 # Réponse
+sum(precipatations)
 ```
 
 À quoi correspond et comment peut-on interpréter le résultat de la fonction suivante ? Vous pouvez vous aider de la page d'aide de la fonction si nécessaire.
 
 ```{r}
-cumsum(precipitations)
+cumsum(precipitations) 
 ```
 
 Même question pour :
@@ -762,6 +778,3 @@ Attention, par défaut la fonction `table` n'affiche pas les valeurs manquantes 
 ```{r}
 summary(d$qualif)
 ```
-
-
-
