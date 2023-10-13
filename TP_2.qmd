@@ -1,0 +1,23 @@
+---
+title: "TP_2"
+format: html
+editor: visual
+---
+
+# Les données du recensement lyonnais entre 2009 et 2019
+
+```{r}
+# Chargement des données
+rp <- aws.s3::s3read_using(FUN = data.table::fread,
+                           object = "/diffusion/RP_LYON_2009_2019.csv",
+                           bucket = "aubinpoissonnier",
+                           opts = list("region" = ""))
+```
+
+# Transformer et analyser ces données
+
+Deux liens qui nous seront utiles :
+
+-   [Le dictionnaire des codes](https://www.data-to-viz.com/)
+
+-   [Les types de visualisation des données](https://www.data-to-viz.com/)
