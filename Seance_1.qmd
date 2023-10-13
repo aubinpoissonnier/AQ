@@ -778,3 +778,124 @@ Attention, par défaut la fonction `table` n'affiche pas les valeurs manquantes 
 ```{r}
 summary(d$qualif)
 ```
+
+
+# Recoder des variables {#sec-vectorfactor}
+
+## Les classes de vecteur
+Les vecteurs peuvent être de classes différentes, selon le type de données qu'ils contiennent.
+
+On a ainsi des vecteurs de type `integer` ou `double`, qui contiennent respectivement des nombres entiers ou décimaux :
+
+```{r}
+library(questionr)
+data(hdv2003)
+typeof(hdv2003$age)
+```
+
+```{r}
+typeof(hdv2003$heures.tv)
+```
+
+Des vecteurs de type `character`, qui contiennent des chaînes de caractères :
+
+```{r}
+vec <- c("Jaune", "Jaune", "Rouge", "Vert")
+typeof(vec)
+```
+
+Et des vecteurs de type `logical`, qui ne peuvent contenir que les valeurs vraie (`TRUE`) ou fausse (`FALSE`).
+
+```{r}
+vec <- c(TRUE, FALSE, FALSE, TRUE)
+typeof(vec)
+```
+
+On peut convertir un vecteur d'un type en un autre en utilisant les fonctions `as.numeric`, `as.character` ou `as.logical`. Les valeurs qui n'ont pas pu être converties sont automatiquement transformées en `NA`.
+
+```{r}
+x <- c("1", "2.35", "8.2e+03", "foo")
+as.numeric(x)
+
+y <- 2:6
+as.character(y)
+
+```
+
+On peut sélectionner certains éléments d'un vecteur à l'aide de l'opérateur `[]`. La manière la plus simple est d'indiquer la position des éléments qu'on veut sélectionner :
+
+```{r}
+vec <- c("Jaune", "Jaune", "Rouge", "Vert")
+vec[c(1, 3)]
+```
+
+La sélection peut aussi être utilisée pour modifier certains éléments d'un vecteur, par exemple :
+
+```{r}
+vec <- c("Jaune", "Jaune", "Rouge", "Vert")
+vec[2] <- "Violet"
+vec
+```
+
+## Tests et comparaison {#sec-tests}
+
+Un test est une opération logique de comparaison qui renvoie vrai (`TRUE`) ou faux (`FALSE`) pour chacun des éléments d'un vecteur.
+
+Parmi les opérateurs de comparaison disponibles, on trouve notamment :
+
+-   `==` qui teste l'égalité
+-   `!=` qui teste la différence
+-   `>`, `<`, `<=`, `>=` qui testent la supériorité ou l'infériorité
+-   `%in%` qui teste l'appartenance à un ensemble de valeurs
+
+Exemple le plus simple :
+
+```{r}
+2 == 3
+```
+
+```{r}
+2 != 3
+```
+
+Exemple appliqué à un vecteur :
+
+```{r}
+x <- 1:10
+x < 5
+```
+
+On peut combiner plusieurs tests avec les opérateurs logiques *et* (`&`) et *ou* (`|`). Ainsi, si on veut tester qu'une valeur est comprise entre 3 et 6 inclus, on peut faire :
+
+```{r}
+x >= 3 & x <= 6
+```
+
+Si on veut tester qu'une valeur est égale à "Bleu" ou à "Vert", on peut faire :
+
+```{r}
+vec <- c("Jaune", "Jaune", "Rouge", "Vert")
+vec == "Jaune" | vec == "Vert"
+```
+
+À noter que dans ce cas, on peut utiliser l'opérateur `%in%`[^4], qui teste si une valeur fait partie des éléments d'un vecteur :
+
+[^4]: Pour accéder à la page de documentation de fonctions comme `%in%`, on ne peut pas utiliser `?%in%`, qui renvoie une erreur. Vous pouvez faire `?"%in%"`, `help("%in%")` ou, dans ce cas, `?match`, car les deux fonctions sont documentées sur la même page d'aide.
+
+```{r}
+vec %in% c("Jaune", "Vert")
+```
+
+::: callout-warning
+Attention, si on souhaite tester si une valeur `x` est inconnue (ou 'manquante'), c'est-à-dire si elle est codée `NA` (*Not Available*), faire le test `x == NA` *ne donnera pas le résultat escompté*. En effet, fidèle à sa réputation de rigueur informaticienne, pour R `NA == NA` ne vaut pas `TRUE` mais... `NA` (on ne sait pas si une valeur inconnue est égale à une autre valeur inconnue).
+
+Pour tester si une valeur est inconnue (`NA`), il faut utiliser la fonction dédiée `is.na` et faire `is.na(x)`.
+
+Cependant, par convention, `NA %in% NA` vaut `TRUE`.
+:::
+
+Enfin, on peut inverser un test avec l'opérateur *non* (`!`) :
+
+```{r}
+!(vec %in% c("Jaune", "Vert"))
+```
