@@ -21,3 +21,64 @@ Deux liens qui nous seront utiles :
 -   [Le dictionnaire des codes](https://www.data-to-viz.com/)
 
 -   [Les types de visualisation des données](https://www.data-to-viz.com/)
+
+```{r}
+library(tidyverse)
+rp2 <- 
+  rp %>%
+  mutate(
+    actif = 
+      ifelse(CS1 == 7 | CS1 == 8,
+             "Inactif",
+             "Actif")
+  )
+
+rp2$actif
+table(rp2$actif)
+
+
+
+rp2 <-
+  rp %>%
+  mutate(
+    cat_prof =
+      case_when(
+        CS1 == 1 | CS1 == 2 ~ "Agriculteurs et artisans",
+        CS1 == 3 | CS1 == 4 ~ "Cadres et professions intermédiaires",
+        CS1 == 5  ~ "Employés",
+        CS1 == 6 ~ "Ouvriers",
+        CS1 == 7 | CS1 == 8 ~ "Inactifs"
+      ),
+    SEXE =
+      fct(ifelse(SEXE == 1, "Homme", "Femme")),
+    annee = as.factor(annee),
+    IMMI = fct(ifelse(IMMI == 1, "Immigré.e", "Pas immigré.e"))
+  ) %>%
+  filter(annee == 2019)
+
+```
+
+```{r}
+ggplot(rp2) +
+    geom_bar(aes(x = cat_prof,
+                 fill = SEXE,
+                 weights = IPONDI)) +
+  labs(title = "Part d'hommes et de femmes dans chaque catégorie socio-professionnelle de la population lyonnaise en 2019",
+       subtitle = "Du texte",
+       caption = "Source : Recensement")
+
+
+ggplot(rp2) +
+  geom_histogram(aes(x = AGEREV))
+
+ggplot(rp2) +
+  geom_violin(aes(x = IMMI,
+                  y = AGEREV))
+
+
+rp2 %>%
+  filter(IMMI == "Pas immigré.e") %>%
+  ggplot() +
+  geom_histogram(aes(x = AGEREV,
+                     weights = IPONDI))
+```
