@@ -61,16 +61,19 @@ Revenez sur les scripts des séances précédentes si vous ne vous souvenez plus
 Le tableau de données s'appelle `hdv2003`. Utilisez les fonctions `dim` et `str` pour décrire la structure du tableau de données.
 
 ```{r}
+
 ```
 
 Créez un duplicata de ce tableau de données que vous appellerez `df` avec l'opérateur `<-` .
 
 ```{r}
+
 ```
 
 Accédez à la variable `poids` du tableau de données à l'aide de l'opérateur `$`.
 
 ```{r}
+
 ```
 
 Citez une variable catégorielle, vérifiez sa classe avec la fonction `class` et présentez ses modalités à l'aide de la fonction `levels`.
