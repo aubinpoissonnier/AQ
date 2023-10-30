@@ -20,6 +20,38 @@ library(tidyverse)
 data("hdv2003")
 ```
 
+## Paramètres
+
+Vous pouvez désactiver ou changer le correcteur orthographique pour que le texte n'apparaisse plus souligné en rouge : allez dans "Tools" \> "Global options" \> "Spelling".
+
+N'oubliez pas de travailler en mode "Visual" plutôt que "Source" pour que le script apparaisse comme un document lisible plutôt qu'un script.
+
+Je rappelle que vous pouvez aussi modifier à votre préférence l'endroit où apparaîtront les sorties des traitements R : en bas des blocs de code ou dans la console. Il faut cliquer sur la petite roue crantée à côté de "Render" en haut du script puis choisir entre "Chunk output inline" ou "Chunk output in console".
+
+## Sauvegarde du script
+
+N'oubliez pas que votre travail n'est pas sauvegardé sur le SSP Cloud. **Il faut exporter votre script au fur et à mesure ou à la fin du DM si vous le complétez en une seule fois.**
+
+### Export
+
+Sélectionner votre DM, cliquez sur "More" puis "Export"
+
+![](export1.PNG)
+
+Enregistrez le DM en le mettant à votre nom. Il faudra choisir un endroit sur votre ordinateur où vous pourrez retrouver le document plus tard.
+
+![](export2.PNG)
+
+### Import
+
+Une fois connectée sur le service R Studio, choisissez "Upload" puis allez chercher le script `DM_votrenom.qmd` que vous avez commencé à modifier.
+
+![](import1.PNG)
+
+![](import2.PNG)
+
+Ouvrez-le et continuez votre travail.
+
 ## Les consignes
 
 Ce DM doit vous permettre de réviser les fonctions vues sur R. Votre rendu permettra de vous accorder maximum 2 points bonus mais ce sera l'évaluation en janvier qui déterminera votre note. Il faudra remplir tous les blocs de code en dessous des consignes. Si malgré plusieurs essais vous ne parvenez pas à faire fonctionner votre code, **il ne faut ni le supprimer ni recopier le code d'une autre personne**. Vous pouvez vous entraider si vous vous retrouvez bloquée mais gardez une trace de votre travail en écrivant le code fonctionnel dans un nouveau bloc de code (petit icône vert "+C" en haut à droite du panneau des scritps, à côté du bouton pour lancer le code). Vous ne serez pas pénalisées et c'est la seule façon d'identifier les points mal compris ou les erreurs systématiques grâce à la correction.
