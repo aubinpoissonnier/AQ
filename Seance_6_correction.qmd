@@ -149,6 +149,28 @@ pisa %>%
   )
 ```
 
+```{r}
+mod <- lm(score_compecr ~ pos_soc, data = pisa, subset = immig2 == "Oui")
+library(segmented)
+
+my.seg <- segmented(mod,
+                    seg.Z = ~ pos_soc,
+                    psi = 0)
+
+summary(my.seg)
+
+my.fitted <- fitted(my.seg)
+my.model <- data.frame(pos_soc = mod$model$pos_soc, score = my.fitted)
+
+ggplot(my.model) +
+  geom_line(aes(x = pos_soc,
+                y = score))
+
+table(is.na(pisa$score_compecr))
+
+
+```
+
 En créant des quantiles, soit des classes d'effectifs qui hiérarchisent la population : les 20% les plus favorisés contre les 20% les plus défavorisés.
 
 ```{r}
