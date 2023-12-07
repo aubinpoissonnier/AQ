@@ -110,13 +110,46 @@ summary(m1)
 
 ```{r}
 # Selon le statut d'immigration
+# On recode avant en une variable binaire
+pisa <-
+  pisa %>% 
+  mutate(immig2 = if_else(immig == "Non", "Non", "Oui"))
+
+pisa_w <-
+  svydesign(
+    ids = ~ 1, # Argument pour spécifier s'il l'enquête a été faite par grappes
+    data = pisa, # Le tableau de données
+    weights = pisa$poids # Les poids
+  )
+
+
 m1 <- svyglm(
-  score_compecr ~ pos_soc*immig + sexe, # La formule du modèle
+  score_compecr ~ pos_soc*immig2 + sexe, # La formule du modèle
   design = pisa_w)
 summary(m1)
 ```
 
 Est-ce que la liaison linéaire est la plus pertinente ?
+
+Une visualisation graphique par des modèles localisés, qu'on ne traite pas dans le cours.
+
+```{r}
+# Régressions localisées
+pisa %>%
+  filter(!is.na(immig2)) %>%
+  ggplot(
+    aes(x = pos_soc,
+        y = score_compecr)
+  ) +
+  geom_point() +
+  geom_smooth(
+    method = "loess",
+    aes(color = immig2,
+        weight = poids)
+  )
+```
+
+En créant des quantiles, soit des classes d'effectifs qui hiérarchisent la population : les 20% les plus favorisés contre les 20% les plus défavorisés.
 
 ```{r}
 # On crée des 5 quantiles de taille équivalente
@@ -139,10 +172,6 @@ table(pisa$pos_soc_5c)
 # Il faut d'abord vérifier les effectifs
 table(pisa$pos_soc_5c, pisa$immig)
 
-# On recode
-pisa <-
-  pisa %>% 
-  mutate(immig2 = if_else(immig == "Non", "Non", "Oui"))
 
 # On vérifie les effectifs après recodage
 table(pisa$pos_soc_5c, pisa$immig2)
