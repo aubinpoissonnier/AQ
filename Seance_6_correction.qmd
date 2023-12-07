@@ -171,9 +171,6 @@ table(pisa$pos_soc_5c)
 # Représentation graphique de l'effet de la position sociale selon le statut d'immigration
 # Il faut d'abord vérifier les effectifs
 table(pisa$pos_soc_5c, pisa$immig)
-
-
-# On vérifie les effectifs après recodage
 table(pisa$pos_soc_5c, pisa$immig2)
 
 # On refait la base pondérée puisqu'on a ajouté une variable au tableau brut
