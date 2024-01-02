@@ -51,7 +51,7 @@ La variable `retard` compte le nombre de retards de l'élève au cours des 2 der
 
 10. Comparez le score moyen pondéré en compétences à l'écrit des élèves jamais en retard contre ceux qui arrivent 1 fois ou plus en retard.
 
-11. Comparez le score moyen pondéré en compétences à l'écrit des élèves filles jamais en retard/élèves garçons jamais en retard/élèves filles parfois en retard/élèves garçons parfois en retard. Commentez les différences obtenues en termes d'écart de genre dans les performances scolaires et de rapport à l'école.
+11. Comparez le score moyen pondéré en compétences à l'écrit des élèves filles jamais en retard/élèves garçons jamais en retard/élèves filles en retard 1 fois ou plus/élèves garçons en retard 1 fois ou plus (variable `retard_bin`). Commentez les différences obtenues en termes d'écart de genre dans les performances scolaires et de rapport à l'école.
 
 12. Mettez en place un modèle qui permettrait de séparer l'effet du genre de l'effet de la ponctualité sur le score en compétences à l'écrit. Transformez le modèle pour que l'on connaisse l'effet de la ponctualité sur le genre pour chaque genre. Concluez sur la significativité des coefficients obtenus et leur sens sociologique.
 
