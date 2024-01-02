@@ -53,11 +53,11 @@ La variable `retard` compte le nombre de retards de l'élève au cours des 2 der
 
 11. Comparez le score moyen pondéré en compétences à l'écrit des élèves filles jamais en retard/élèves garçons jamais en retard/élèves filles en retard 1 fois ou plus/élèves garçons en retard 1 fois ou plus (variable `retard_bin`). Commentez les différences obtenues en termes d'écart de genre dans les performances scolaires et de rapport à l'école.
 
-12. Mettez en place un modèle qui permettrait de séparer l'effet du genre de l'effet de la ponctualité sur le score en compétences à l'écrit. Transformez le modèle pour que l'on connaisse l'effet de la ponctualité sur le genre pour chaque genre. Concluez sur la significativité des coefficients obtenus et leur sens sociologique.
+12. Mettez en place un modèle qui permettrait de séparer l'effet du genre de l'effet de la ponctualité sur le score en compétences à l'écrit. Transformez le modèle pour que l'on connaisse l'effet de la ponctualité sur le score pour chaque genre. Concluez sur la significativité des coefficients obtenus et leur sens sociologique.
 
 13. Créez une nouvelle colonne à partir de la variable `sent_appart` regroupant d'un côté les élèves qui disent être tout à fait d'accord (= 1) et d'accord (= 2) avec l'affirmation "je me sens chez moi à l'école" et ceux qui disent ne pas être d'accord (= 3) et pas du tout d'accord (= 4). **Attention, utilisez bien `if_else`** **plutôt que `ifelse`** pour que les non-réponses restent codées comme des `NA`.
 
-14. Faites un tri croisé en pourcentages de la position sociale découpée en 5 quantiles `pos_soc_5c` et de la variable binaire de sentiment d'appartenance à l'école. Interprétez avec un test statistique le résultat obtenu.
+14. Faites un tri croisé en pourcentages de la position sociale découpée en 5 quantiles `pos_soc_5c` et de la nouvelle variable binaire de sentiment d'appartenance à l'école. Interprétez avec un test statistique le résultat obtenu.
 
 15. Recodez la variable de niveau d'étude maximum des parents `etud_par` en choisissant des noms de modalités courts, sachant que la variable est codée comme tel : 3 = baccalauréat professionnel ou moins; 4 = baccaulauréat général ou technologique; 5 = diplôme de l'enseignement supérieur court ; 6 = licence et plus
 
