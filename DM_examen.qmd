@@ -17,7 +17,11 @@ Les compétences à l'écrit expriment la capacité de comprendre, d'utiliser et
 Le statut socio-économique, ou plus précisément le statut économique, social et culturel de l'élève (ESCS) est un indice composite composé à partir de trois indices : le statut socioprofessionnel des parents (basé sur les métiers exercés par les parents), le niveau de formation (nombre d'années d'études) des parents, ainsi que le patrimoine familial. Ce dernier indice inclut lui-même un grand nombre de variables parmi lesquelles les ressources culturelles disponibles dans le foyer (livres), les ressources éducatives (un endroit calme pour travailler, des ouvrages de références ou des logiciels éducatifs) ainsi que d'autres ressources (voiture, connexion internet. . .)
 
 ```{r}
-# Chargement des packages
+install.packages(questionr)
+```
+
+```{r}
+# Chargement des packages et des données
 library(tidyverse)
 library(questionr)
 # Chargement des données PISA
@@ -28,6 +32,8 @@ pisa <- aws.s3::s3read_using(FUN = readRDS,
 ```
 
 ## Pratique du code
+
+**Lancez le bloc de code de chargement des données et n'oubliez pas d'installer le package questionr, soit en cliquant sur le bandeau jaune qui apparaît en haut de la fenêtre, soit en lançant la commande du bloc en haut "install.packages("questionr")"**
 
 La variable `retard` compte le nombre de retards de l'élève au cours des 2 dernières semaines : 1= jamais, 2 =1 ou 2 fois, 3 = 3 ou 4 fois, 4 = 5 ou plus fois. La variable `poids` est la variable de pondération.
 
@@ -66,7 +72,6 @@ La variable `retard` compte le nombre de retards de l'élève au cours des 2 der
 17. Annotez le graphique avec tous les éléments attendus
 
 18. Formulez une interprétation en articulant le tri croisé du sentiment d'appartenance et de la position sociale avec le graphique représentant la distribution du niveau maximum d'étude atteint par les parents selon la position sociale
-
 
 ```{r}
 
