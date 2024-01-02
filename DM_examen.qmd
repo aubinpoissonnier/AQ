@@ -1,0 +1,98 @@
+---
+title: "DM examen"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+# Entraînement avant l'examen final
+
+## Données de l'enquête PISA 2012 (Séance 6)
+
+Dans l'enquête PISA, les compétences en mathématiques expriment l'aptitude des élèves de 15 ans à formuler, employer et interpréter des mathématiques dans de multiples contextes, pour décrire, expliquer et prévoir des phénomènes, en comprenant le rôle que les mathématiques jouent dans le monde.
+
+Les compétences à l'écrit expriment la capacité de comprendre, d'utiliser et d'interpréter des textes écrits en vue de réaliser ses objectifs, développer ses connaissances et son potentiel et prendre une part active dans la société. L'indicateur utilisé est le score moyen.
+
+Le statut socio-économique, ou plus précisément le statut économique, social et culturel de l'élève (ESCS) est un indice composite composé à partir de trois indices : le statut socioprofessionnel des parents (basé sur les métiers exercés par les parents), le niveau de formation (nombre d'années d'études) des parents, ainsi que le patrimoine familial. Ce dernier indice inclut lui-même un grand nombre de variables parmi lesquelles les ressources culturelles disponibles dans le foyer (livres), les ressources éducatives (un endroit calme pour travailler, des ouvrages de références ou des logiciels éducatifs) ainsi que d'autres ressources (voiture, connexion internet. . .)
+
+```{r}
+# Chargement des packages
+library(tidyverse)
+library(questionr)
+# Chargement des données PISA
+pisa <- aws.s3::s3read_using(FUN = readRDS,
+                           object = "/diffusion/pisa.RDS",
+                           bucket = "aubinpoissonnier",
+                           opts = list("region" = ""))
+```
+
+## Transformation des données
+
+La variable `retard` compte le nombre de retards de l'élève au cours des 2 dernières semaines : 1= jamais, 2 =1 ou 2 fois, 3 = 3 ou 4 fois, 4 = 5 ou plus fois. La variable `poids` est la variable de pondération.
+
+-   Faites un tri à plat pondéré de la variable `retard` et représentez la distribution du nombre de retards à l'aide d'un diagramme en barres pondéré.
+
+-   Annotez le graphique obtenu avec tous les éléments nécessaires
+
+-   Recodez la variable de deux façons : une nouvelle variable de retard de 3 modalités (jamais/1 ou 2 fois/ 3 fois ou plus) et une de 2 modalités (jamais/en retard).
+
+-   Vérifiez votre recodage en faisant un tri croisé avec les variables déjà existantes `retard_3c` et `retard_bin`.
+
+-   Faites un tri croisé pondéré en pourcentages de la variable `sexe` et de la variable `retard_3c` (façon rapide avec `wtd.table` et `rprop` ou `lprop`).
+
+-   Faites une lecture de ce tableau croisé en termes d'indépendance entre le sexe et le fait d'arriver en retard. Vérifiez la significativité des différences observées à l'aide d'un test statistique adapté et rédigez votre conclusion.
+
+-   Comparez le score moyen pondéré en compétences à l'écrit des filles et des garçons.
+
+-   Comparez le score moyen pondéré en compétences à l'écrit des élèves jamais en retard contre ceux qui arrivent 1 fois ou plus en retard.
+
+-   Comparez le score moyen pondéré en compétences à l'écrit des élèves filles jamais en retard/élèves garçons jamais en retard/élèves filles parfois en retard/élèves garçons parfois en retard. Commentez les différences obtenues en termes d'écart de genre dans les performances scolaires et de rapport à l'école.
+
+-   Mettez en place un modèle qui permettrait de séparer l'effet du genre de l'effet de la ponctualité sur le score en compétences à l'écrit. Transformez le modèle pour que l'on connaisse l'effet de la ponctualité sur le genre pour chaque genre. Concluez sur la significativité des coefficients obtenus et leur sens sociologique.
+
+```{r}
+table(pisa$retard, pisa$retard_3c)
+pisa %>%
+  ggplot() +
+  geom_bar(aes(x = retard,
+               weight = poids))
+
+wtd.table(pisa$sexe, pisa$retard_3c, pisa$poids) %>%
+  rprop()
+
+chisq.test(pisa$sexe, pisa$retard_3c)
+
+
+pisa %>%
+  group_by(sexe) %>%
+  summarize(maths = wtd.mean(score_compecr, weights = poids))
+
+pisa %>%
+  group_by(retard_bin) %>%
+  summarize(maths = wtd.mean(score_compecr, weights = poids))
+
+pisa %>%
+  group_by(sexe, retard_bin) %>%
+  summarize(maths = wtd.mean(score_compecr, weights = poids))
+
+
+
+
+m1 <- lm(score_compecr ~ sexe + retard_bin, data = pisa)
+summary(m1)
+
+m2 <- lm(score_compecr ~ sexe*retard, data = pisa)
+summary(m2)
+```
+
+```{r}
+wtd.table(pisa$pos_soc_5c, pisa$sent_appart, weights = pisa$poids) %>%
+  rprop()
+
+pisa %>%
+  summarize(t = mean(pos_soc),
+            .by = pos_soc_5c)
+
+table(pisa$sent_appart)
+```

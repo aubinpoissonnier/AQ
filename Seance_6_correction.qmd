@@ -6,7 +6,7 @@ editor_options:
   chunk_output_type: console
 ---
 
-## Enquête PISA
+## Enquête PISA 2012
 
 Dans l'enquête PISA, les compétences en mathématiques expriment l'aptitude des élèves de 15 ans à formuler, employer et interpréter des mathématiques dans de multiples contextes, pour décrire, expliquer et prévoir des phénomènes, en comprenant le rôle que les mathématiques jouent dans le monde.
 
@@ -50,8 +50,8 @@ pisa %>%
     title = "Score de compétences à l'écrit selon la position sociale",
     x = "Indice de position sociale",
     y = "Score de compétences à l'écrit",
-    caption = "Champ : élèves de 15 ans scolarisé.es en France en 2018 \n
-    Source : PISA 2018 (OCDE) | A. POISSONNIER | 2023"
+    caption = "Champ : élèves de 15 ans scolarisé.es en France en 2012 \n
+    Source : PISA 2012 (OCDE) | A. POISSONNIER | 2023"
   )
 
 ```
