@@ -27,32 +27,120 @@ pisa <- aws.s3::s3read_using(FUN = readRDS,
                            opts = list("region" = ""))
 ```
 
-## Transformation des données
+## Pratique du code
 
 La variable `retard` compte le nombre de retards de l'élève au cours des 2 dernières semaines : 1= jamais, 2 =1 ou 2 fois, 3 = 3 ou 4 fois, 4 = 5 ou plus fois. La variable `poids` est la variable de pondération.
 
--   Faites un tri à plat pondéré de la variable `retard` et représentez la distribution du nombre de retards à l'aide d'un diagramme en barres pondéré.
+1.  Faites un tri à plat pondéré en pourcentages de la variable `retard`.
 
--   Annotez le graphique obtenu avec tous les éléments nécessaires
+2.  Recodez la variable de deux façons, en créant des facteurs respectant l'ordre logique des modalités : une nouvelle variable de retard de 3 modalités (jamais/1 ou 2 fois/ 3 fois ou plus) et une de 2 modalités (jamais/en retard). **Attention, utilisez bien `if_else`** **plutôt que `ifelse`** pour que les non-réponses restent codées comme des `NA`
 
--   Recodez la variable de deux façons : une nouvelle variable de retard de 3 modalités (jamais/1 ou 2 fois/ 3 fois ou plus) et une de 2 modalités (jamais/en retard).
+3.  Vérifiez votre recodage en faisant un tri croisé avec les variables déjà existantes `retard_3c` et `retard_bin`.
 
--   Vérifiez votre recodage en faisant un tri croisé avec les variables déjà existantes `retard_3c` et `retard_bin`.
+4.  Représentez la distribution du nombre de retards codé en 3 catégories à l'aide d'un diagramme en barres pondéré, en ayant filtré les valeurs `NA` pour la variable de retard.
 
--   Faites un tri croisé pondéré en pourcentages de la variable `sexe` et de la variable `retard_3c` (façon rapide avec `wtd.table` et `rprop` ou `lprop`).
+5.  Faites la même représentation graphique mais représentez des pourcentages plutôt que des effectifs.
 
--   Faites une lecture de ce tableau croisé en termes d'indépendance entre le sexe et le fait d'arriver en retard. Vérifiez la significativité des différences observées à l'aide d'un test statistique adapté et rédigez votre conclusion.
+6.  Représentez à nouveau la distribution du nombre de retard, mais colorez les barres en fonction du genre et mettez côte à côte les barres représentant en pourcentage les retards chez les élèves filles et chez les élèves garçons.
 
--   Comparez le score moyen pondéré en compétences à l'écrit des filles et des garçons.
+7.  Annotez le graphique précédent avec tous les éléments attendus
 
--   Comparez le score moyen pondéré en compétences à l'écrit des élèves jamais en retard contre ceux qui arrivent 1 fois ou plus en retard.
+8.  Faites un tri croisé pondéré en pourcentages de la variable `sexe` et de la variable `retard_3c` (façon rapide avec `wtd.table` et `rprop` ou `lprop`).
 
--   Comparez le score moyen pondéré en compétences à l'écrit des élèves filles jamais en retard/élèves garçons jamais en retard/élèves filles parfois en retard/élèves garçons parfois en retard. Commentez les différences obtenues en termes d'écart de genre dans les performances scolaires et de rapport à l'école.
+9.  Faites une lecture de ce tableau croisé en termes d'indépendance entre le sexe et le fait d'arriver en retard. Vérifiez la significativité des différences observées à l'aide d'un test statistique adapté et rédigez votre conclusion.
 
--   Mettez en place un modèle qui permettrait de séparer l'effet du genre de l'effet de la ponctualité sur le score en compétences à l'écrit. Transformez le modèle pour que l'on connaisse l'effet de la ponctualité sur le genre pour chaque genre. Concluez sur la significativité des coefficients obtenus et leur sens sociologique.
+10. Comparez le score moyen pondéré en compétences à l'écrit des filles et des garçons.
+
+11. Comparez le score moyen pondéré en compétences à l'écrit des élèves jamais en retard contre ceux qui arrivent 1 fois ou plus en retard.
+
+12. Comparez le score moyen pondéré en compétences à l'écrit des élèves filles jamais en retard/élèves garçons jamais en retard/élèves filles parfois en retard/élèves garçons parfois en retard. Commentez les différences obtenues en termes d'écart de genre dans les performances scolaires et de rapport à l'école.
+
+13. Mettez en place un modèle qui permettrait de séparer l'effet du genre de l'effet de la ponctualité sur le score en compétences à l'écrit. Transformez le modèle pour que l'on connaisse l'effet de la ponctualité sur le genre pour chaque genre. Concluez sur la significativité des coefficients obtenus et leur sens sociologique.
+
+14. Créez une nouvelle colonne à partir de la variable `sent_appart` regroupant d'un côté les élèves qui disent être tout à fait d'accord (= 1) et d'accord (= 2) avec l'affirmation "je me sens chez moi à l'école) et ceux qui disent ne pas être d'accord (= 3) et pas du tout d'accord (= 4). **Attention, utilisez bien `if_else`** **plutôt que `ifelse`** pour que les non-réponses restent codées comme des `NA`.
 
 ```{r}
+# 1
+wtd.table(pisa$retard, weights = pisa$poids) %>%
+  rprop()
+pisa %>%
+  ggplot() +
+  geom_bar(aes(x = retard,
+               weight = poids))
+
+# 2
+pisa <-
+  pisa %>%
+  mutate(retard_bin = 
+           fct(
+             if_else(retard == 1, "Non", "Oui"),
+             levels = c("Non", "Oui")
+             ),
+         retard_3c =
+           fct(
+             case_when(
+               retard == 1 ~ "0 fois",
+               retard == 2 ~ "1 ou 2 fois",
+               retard > 2 ~ "3 fois ou plus"
+             ),
+             levels = c("0 fois", "1 ou 2 fois", "3 fois ou plus")
+           )
+         )
+
+# 3
+table(pisa$retard, pisa$retard_bin)
 table(pisa$retard, pisa$retard_3c)
+
+
+# 4
+pisa %>%
+  filter(!is.na(retard_3c)) %>%
+  ggplot() +
+  geom_bar(aes(x = retard_3c,
+               weight = poids))
+
+# 5
+pisa %>%
+  filter(!is.na(retard_3c)) %>%
+  count(retard_3c, wt = poids) %>%
+  mutate(p = n/sum(n)) %>%
+  ggplot() +
+  geom_bar(aes(x = retard_3c,
+               y = p),
+           stat = "identity") +
+  labs( 
+    title = "Nombre de retards au cours des deux dernières semaines de classe",
+    x = "Nombre de retards",
+    y = "Effectifs",
+    caption = "Champ : élèves de 15 ans scolarisé.es en France en 2012
+    Source : PISA 2012 (OCDE) | A. POISSONNIER | 2023"
+  )
+
+
+# 5
+pisa %>%
+  filter(!is.na(retard_3c)) %>%
+  count(sexe, retard_3c, wt = poids) %>%
+  group_by(sexe) %>%
+  mutate(p = n/sum(n)) %>%
+  ungroup(sexe) %>%
+  ggplot() +
+  geom_bar(aes(x = retard_3c,
+               y = p,
+               fill = sexe),
+           stat = "identity",
+           position = "dodge") +
+  labs( 
+    title = "Nombre de retards au cours des deux dernières semaines de classe",
+    x = "Nombre de retards",
+    y = "Effectifs",
+    caption = "Champ : élèves de 15 ans scolarisé.es en France en 2012
+    Source : PISA 2012 (OCDE) | A. POISSONNIER | 2023"
+  )
+
+
+
+#
 pisa %>%
   ggplot() +
   geom_bar(aes(x = retard,
