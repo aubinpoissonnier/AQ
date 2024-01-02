@@ -65,7 +65,7 @@ La variable `retard` compte le nombre de retards de l'élève au cours des 2 der
 
 17. Annotez le graphique avec tous les éléments attendus
 
-18. Formulez une interprétation en croisant le tri croisé du sentiment d'appartenance et de la position sociale avec le graphique représentant la distribution du niveau maximum d'étude atteint par les parents selon la position sociale
+18. Formulez une interprétation en articulant le tri croisé du sentiment d'appartenance et de la position sociale avec le graphique représentant la distribution du niveau maximum d'étude atteint par les parents selon la position sociale
 
 ```{r}
 # 1
