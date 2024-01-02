@@ -1,5 +1,5 @@
 ---
-title: "DM examen"
+title: "DM examen corrigé"
 format: html
 editor: visual
 editor_options: 
@@ -66,11 +66,6 @@ La variable `retard` compte le nombre de retards de l'élève au cours des 2 der
 17. Annotez le graphique avec tous les éléments attendus
 
 18. Formulez une interprétation en croisant le tri croisé du sentiment d'appartenance et de la position sociale avec le graphique représentant la distribution du niveau maximum d'étude atteint par les parents selon la position sociale
-
-```{r}
-wtd.table(pisa$etud_par, weights = pisa$poids) %>%
-  proportions()
-```
 
 ```{r}
 # 1
