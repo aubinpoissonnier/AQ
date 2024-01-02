@@ -1,0 +1,586 @@
+---
+title: "DM d'application - Code complété"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+# Comment faire ce DM
+
+## Bloc de code à lancer pour charger les packages et les données
+
+```{r}
+options(max.print = 20)
+library(questionr)
+library(Hmisc)
+library(tidyverse)
+
+data("hdv2003")
+```
+
+## Les consignes
+
+Ce DM doit vous permettre de réviser les fonctions vues sur R. Votre rendu permettra de vous accorder maximum 2 points bonus mais ce sera l'évaluation en janvier qui déterminera votre note. Il faudra remplir tous les blocs de code en dessous des consignes. Si malgré plusieurs essais vous ne parvenez pas à faire fonctionner votre code, **il ne faut ni le supprimer ni recopier le code d'une autre personne**. Vous pouvez vous entraider si vous vous retrouvez bloquée mais gardez une trace de votre travail en écrivant le code fonctionnel dans un nouveau bloc de code (petit icône vert "+C" en haut à droite du panneau des scritps, à côté du bouton pour lancer le code). Vous ne serez pas pénalisées et c'est la seule façon d'identifier les points mal compris ou les erreurs systématiques grâce à la correction.
+
+**Il faut écrire en dessous des blocs pour répondre aux consignes et, quand c'est nécessaire** (j'indiquerai "Commentez les résultats"), **proposer une analyse simple des résultats obtenus**. La première partie du cours a été plutôt focalisée sur les compétences sur R que sur les méthodes d'analyses quantitatives même si nous nous sommes entraîné·es à l'oral à interpréter les résultats statistiques. On reprendra à la rentrée ce qui aura potentiellement posé problème.
+
+Exemple d'une consigne et de la façon dont il faut remplir le script :
+
+Utilisez la fonction `nrow`pour compter le nombre d'individus dans notre tableau `hdv2003`
+
+```{r}
+nrow(hdv2003)
+```
+
+Il y a 2000 individus dans notre tableau de données.
+
+Utilisez les fonctions `count`, `group_by` et `mutate` pour connaître la part d'hommes et de femmes qui déclarent pratiquer la chasse ou la pêche. Faites de même pour la lecture de BD.
+
+```{r}
+hdv2003 %>%
+  count(sexe, peche.chasse, wt = poids) %>%
+  group_by(sexe) %>%
+  mutate(p = n/sum(n))
+
+hdv2003 %>%
+  count(sexe, lecture.bd, wt = poids) %>%
+  group_by(sexe) %>%
+  mutate(p = n/sum(n))
+```
+
+20,4% des hommes déclarent pratiquer la chasse ou la pêche contre seulement 5,2% des femmes. Au contraire, seulement 1,6% des hommes déclarent lire des BD contre 3,2% des femmes. Les pratiques de loisirs semblent donc dépendantes du genre. La chasse et la pêche apparaissent comme communs, un homme cinq déclarent l'avoir comme loisir, mais particulièrement masculin puisque quatre fois moins de femmes les pratiquent (on ne se soucie pas ici du test statistique qui montrerait que ce loisir est dépendant du genre, le Khi2 sera revu au cours de la quatrième séance).
+
+## Les ressources
+
+Revenez sur les scripts des séances précédentes si vous ne vous souvenez plus des fonctions à utiliser. Je rappelle que j'ai repris en grande partie [l'introduction à R et au Tidyverse](https://juba.github.io/tidyverse/) de Julien Barnier pour les 2 premières séances, n'hésitez pas à naviguer sur son site ou à faire des recherches google en français ou en anglais. Il faut aussi utiliser le panneau d'aide (en appuyant sur la touche `F1` ou en lançant la commande `help(nom_fonction)` dans votre console) pour connaître les arguments à utiliser. Pour les fonctions de l'univers tidyverse, utilisez plutôt le site en ligne de chaque package pour vous orienter ([dplyr pour la transformation des données](https://dplyr.tidyverse.org/), [ggplot2 pour la visualisation de données](https://ggplot2.tidyverse.org/)). Les aides-mémoires sont accessibles directement depuis R-Studio en allant dans l'onglet Help \> Cheat Sheets.
+
+# Explorer un tableau de données et ses colonnes
+
+Le tableau de données s'appelle `hdv2003`. Utilisez les fonctions `dim` et `str` pour décrire la structure du tableau de données.
+
+```{r}
+str(hdv2003)
+```
+
+Créez un duplicata de ce tableau de données que vous appellerez `df` avec l'opérateur `<-` .
+
+```{r}
+df <- hdv2003
+```
+
+Accédez à la variable `poids` du tableau de données à l'aide de l'opérateur `$`.
+
+```{r}
+hdv2003$poids
+```
+
+Citez une variable catégorielle, vérifiez sa classe avec la fonction `class` et présentez ses modalités à l'aide de la fonction `levels`.
+
+```{r}
+class(hdv2003$occup)
+levels(hdv2003$occup)
+```
+
+Citez une variable numérique, vérifiez sa classe avec la fonction `class` et présentez sa distribution à l'aide de la fonction `summary`.
+
+```{r}
+class(hdv2003$heures.tv)
+summary(hdv2003$heures.tv)
+```
+
+Calculer la moyenne de la variable `heures.tv` avec la fonction `mean`. Ajoutez un argument à la fonction `mean` pour que le résultat obtenu ne soit pas `NA` en expliquant ce que fait cet argument au calcul de la moyenne.
+
+```{r}
+mean(hdv2003$heures.tv, na.rm = T)
+```
+
+Expliquez pourquoi la moyenne donnée par la fonction `mean` est biaisée et utilisez la fonction `weighted.mean` (ou `wtd.mean` du package `Hmisc`, déjà chargé ici) pour obtenir une estimation pondérée de la moyenne.
+
+```{r}
+wtd.mean(hdv2003$heures.tv, w = hdv2003$poids, na.rm = T)
+```
+
+Faites de même pour la variance à l'aide de la fonction `wtd.var` du package `Hmisc` (il est déjà chargé ici et il n'existe pas d'équivalent dans le `R` de base. Attention, l'argument pour spécifier le paramètre des poids ne s'écrit pas `w =` comme pour la fonction `weighted.mean`).
+
+```{r}
+wtd.var(hdv2003$heures.tv, weights = hdv2003$poids)
+```
+
+Utilisez la fonction `table` pour faire un tri à plat de la variable `relig`.
+
+```{r}
+table(hdv2003$relig)
+```
+
+Précisions : il est possible de faire des tris croisés à l'aide de la fonction `table` en indiquant 2 variables en argument. Dans le package `Hmisc`, la fonction `wtd.table` du package permet de faire ces mêmes tris en tenant compte des poids. Il suffit d'utiliser la fonction `lprop` ou `rprop` pour obtenir des pourcentages par catégorie, pour l'ensemble de la population et les totaux. **Les verbes du package `dplyr`** **(tidyverse) ont été privilégiés dans ce cours pour leur flexibilité mais rien ne vous empêche d'utiliser ces fonctions, notamment si vous ne souhaitez pas utiliser les résultats pour faire des représentations graphiques et voulez obtenir rapidement une présentation synthétique des tableaux de fréquence.**
+
+```{r}
+# Le tri croisé pondéré
+# questionr:: permet de spécifier qu'on veut la fonction wtd.table de questionr et pas du package Hmisc contenant une fonction du même nom
+questionr::wtd.table(hdv2003$sexe, hdv2003$relig, weights = hdv2003$poids)
+```
+
+```{r}
+# Les pourcentages en ligne avec les ensembles et les totaux 
+#lprop(tab)
+```
+
+```{r}
+#|eval: false
+# Les pourcentages en colonne avec les ensembles et les totaux
+#rprop(tab)
+```
+
+# Transformation et analyse de variables qualitatives
+
+## Rappel sur le fonctionnement de l'univers tidyverse
+
+On rappelle que l'opérateur `%>%` permet d'enchaîner les opérations. Cet opérateur est adapté à l'univers tidyverse dans lequel il n'est plus nécessaire d'utiliser l'opérateur `$` pour travailler sur une colonne une fois qu'on a annoncé les données à utiliser. Voici un exemple pour le tri croisé.
+
+Lancez bien chaque bloc de code individuellement pour observer les résultats obtenus.
+
+```{r}
+## Faire un tri croisé avec le R de base sur la variable sexe
+table(hdv2003$sexe)
+# Ici, on a un seul argument : la colonne sexe récupérée en écrivant hdv2003$sexe
+```
+
+```{r}
+## Faire un tri croisé avec la fonction count du tidyverse (spécifiquement, le package dplyr du tidyverse), sans utiliser l'opérateur pipe
+count(hdv2003, sexe)
+# Ici, on a 2 arguments, le tableau de données puis la colonne sur laquelle on fait l'opération
+```
+
+```{r}
+## Faire un tri croisé avec la fonction count et l'opérateur pipe
+hdv2003 %>%
+  count(sexe)
+# Ici, on a "envoyé" le tableau hdv2003 à la deuxième ligne pour la deuxième opération. Du coup, hdv2003 est automatiquement considéré comme le premier argument de count, et il faut quand même rajouter le deuxième argument de la colonne sur laquelle on travaille
+```
+
+```{r}
+# L'enchaînement des transformations peut continuer. On peut "envoyer" notre tri croisé pour continuer à le transformer, par exemple en crééant une nouvelle colonne qui convertit l'unité en milliers d'individus (division par 1000 des effectifs)
+hdv2003 %>%
+  count(sexe) %>%
+  mutate(n_1000 = # la colonne à créer
+           n/1000) # qui vaut la colonne des effectifs n divisée par 1000
+```
+
+On rappelle les opérateurs logiques :
+
+-   `==` pour tester l'égalité
+
+-   `!=` pour tester la différence
+
+-   `%in%` pour tester l'inclusion dans un ensemble de valeurs, par exemple de 1 à 10 : `x %in% 1:10`
+
+-   `>` `>=` `<` `<=` pour supérieur, supérieur ou égal, inférieur et inférieur ou égal
+
+-   Les opérateurs pour combiner les conditions
+
+    -   `&` pour la combinaison de deux conditions : opérateur ET
+
+    -   `|` pour l'alternative entre deux conditions : opérateur OU
+
+    -   `!` pour inverser le sens logique du test
+
+    -   `()` pour faire des blocs de condition
+
+```{r}
+# Un exemple simple
+x <- 5
+
+## Cumul de deux conditions (ET) équivalentes mais écrites différemment
+# x est-il supérieur à 2 et inférieur à 10
+(x > 2 & x < 10) & # ET
+  # l'inverse de "x inférieur à 2 et supérieur à 10"
+  # soit x supérieur à 2 et inférieur à 10"
+  !(x < 2 & x > 10)
+```
+
+## Recoder des données
+
+Ajoutez une colonne au tableau `hdv2003` appelée `fam_nombreuse` avec la fonction `mutate`. Utilisez la fonction `ifelse` pour recoder la variable `freres.soeurs` : dans le cas où l'enquêté.e a plus de 5 frères et soeurs, la variable prend la valeur "plus de 5 frères et soeurs", sinon la valeur "5 ou moins frères et soeurs". N'oubliez pas qu'il faut réécrire sur `hdv2003` avec l'opérateur d'assignation `<-` pour modifier le tableau, sinon le tableau transformé sera juste affiché dans la console mais rien ne sera enregistré.
+
+```{r}
+hdv2003 <-
+  hdv2003 %>%
+  mutate(
+    fam_nombreuse = ifelse(freres.soeurs > 5,
+                           "plus de 5 frères et soeurs",
+                           "5 ou moins frères et soeurs")
+  )
+```
+
+En plus d'`ifelse`, utilisez la fonction `fct` pour que la nouvelle colonne obtenue soit un facteur. L'ordre des modalités doit être : "5 ou moins frères et soeurs" puis "plus de 5 fréres et soeurs".
+
+```{r}
+hdv2003 <-
+  hdv2003 %>%
+  mutate(
+    fam_nombreuse = 
+      fct(
+        ifelse(freres.soeurs > 5,
+               "plus de 5 frères et soeurs",
+               "5 ou moins frères et soeurs"),
+        c("5 ou moins frères et soeurs",
+          "plus de 5 frères et soeurs")
+      )
+  )
+```
+
+Utilisez la fonction `case_when` pour créer une colonne appelée `type_fam` qui aura 3 modalités : pas de frères et soeurs, 1 à 3 frères et soeurs, plus de 5 frères et soeurs. Il faut à nouveau utiliser la fonction `fct` pour que la nouvelle colonne soit bien un facteur dont vous préciserez l'ordre des modalités. On rappelle que l'opérateur `:` permet d'avoir des séquences de nombre : le vecteur `c(1, 2, 3)` peut s'écrire `1:3`.
+
+```{r}
+hdv2003 <-
+  hdv2003 %>%
+  mutate(
+    type_fam = 
+      fct(
+        case_when(freres.soeurs == 0 ~ "pas de frères et soeurs",
+                  freres.soeurs %in% 1:3 ~ "1 à 3 frères et soeurs",
+                  freres.soeurs > 3 ~ "plus de 3 frères et soeurs"),
+        levels = c("pas de frères et soeurs",
+                   "1 à 3 frères et soeurs",
+                   "plus de 3 frères et soeurs")
+      )
+  )
+```
+
+Utilisez la fonction `case_when` pour créer trois classes d'âges à partir de la variable `age` : 18 à 30 ans, 31 à 60 ans, 61 ans et plus. Appelez la nouvelle colonne `cat_age` et n'oubliez pas d'en faire un facteur dont les modalités sont dans le bon ordre.
+
+```{r}
+hdv2003 <-
+  hdv2003 %>%
+  mutate(
+    cat_age = 
+      fct(
+        case_when(age %in% 18:30 ~ "18 à 30 ans",
+                  age %in% 31:60 ~ "31 à 60 ans",
+                  age > 60 ~ "61 ans et plus"),
+        levels = c("18 à 30 ans",
+                   "31 à 60 ans",
+                   "61 ans et plus")
+      )
+  )
+```
+
+Remarque : l'âge est une propriété sociale qui peut être mesurée par des variables de plusieurs natures. Théoriquement, l'âge est une variable quantitative continue : il peut prendre un nombre infini de valeurs qu'on exprime avec une précision plus ou moins grandes (avoir 19 ans, 3 mois, 2 jours, 3 heures etc). L'âge est dans les faits souvent exprimé sous forme de variable quantitative discrète prenant un nombre fini de valeurs (18 ans, 19 ans, avec comme minimum 0 an et un maximum autour de 120 ans). L'enquête histoire de vie mesure l'âge en années révolues, ce qui correspond bien à des nombres entiers plutôt que des nombreux décimaux. Ici, l'utilisation de classes d'âge permet de traiter l'âge comme une variable qualitative : chaque enquêté.e appartient à une catégorie d'âge parmi les 3 options disponibles.
+
+## Construire un tableau de contingence à partir d'un tri croisé de deux variables catérogielles
+
+Utilisez la fonction `count` pour faire un tri croisé des variables `cat_age` et `type_fam`. N'oubliez pas qu'il faut utiliser l'argument `wt =` pour que les calculs utilisent la variable de pondération `poids`
+
+```{r}
+hdv2003 %>%
+  count(cat_age, type_fam, wt = poids)
+```
+
+Reprenez le code que vous venez d'écrire et continuez à transformer le tableau avec l'opérateur `%>%` pour calculer des pourcentages. Il faudra utiliser la fonction `group_by` associée à la fonction `mutate` pour créer une nouvelle colonne appelée `p` qui fait la division de `n`, les effectifs de chaque ligne (= l'effectif de chaque type familial **calculé au sein de chaque catégorie d'âge**), par `sum(n)`, le total d'individu **dans chaque catégorie d'âge**. Retournez voir la séance 3 pour trouver la présentation de cette opération si vous n'y arrivez pas.
+
+```{r}
+hdv2003 %>%
+  count(cat_age, type_fam, wt = poids) %>%
+  group_by(cat_age) %>%
+  mutate(p = n/sum(n)) %>%
+  ungroup()
+```
+
+Calculez maintenant les moyennes d'ensemble pour pouvoir interpréter les pourcentages du tri croisé. Elles correspondent à la part de chaque type familial dans la population, soit le tri à plat de variable `type_fam` transformé en pourcentages. Il faut à nouveau utiliser les fonctions `count` et `mutate` mais `group_by` ne sera pas nécessaire car on n'a croisé aucune variable dans le compte des effectifs.
+
+```{r}
+hdv2003 %>%
+  count(cat_age, wt = poids) %>%
+  mutate(p = n/sum(n))
+```
+
+## Lire et interpréter un tableau de contingence
+
+Voici le tableau croisé que l'on peut construire à partir des pourcentages obtenus par le code.
+
+![](cat_age.png){width="569"}
+
+**Commentez en deux temps ce tableau :**
+
+1.  Présenter les résultats de ce tableau en quelques phrases et expliquez ce qu'on apprend du lien entre le type de famille et l'âge des enquêté·es
+2.  Expliquez ce résultat à l'aide du graphique ci-dessous
+
+![](fecondite.PNG){width="532"}
+
+> Définitions :
+>
+> -   La descendance finale d'une génération représente le nombre moyen d'enfants mis au monde par les femmes nées au cours d'une année donnée et ayant survécu jusqu'à l'âge de 50 ans au moins.
+>
+> -   L'indice conjoncturel de fécondité est la somme des taux de fécondité par âge observés une année donnée. Il indique le nombre total d'enfants des femmes d'une génération fictive qui aurait à chaque âge la fécondité observée à cet âge l'année considérée
+
+```{r}
+library(gt)
+hdv2003 %>%
+  count(cat_age, type_fam, wt = poids) %>%
+  group_by(cat_age) %>%
+  mutate(p = n/sum(n),
+         tot = sum(n)) %>%
+  select(-n) %>%
+  ungroup() %>%
+  pivot_wider(values_from = p,
+              names_from = type_fam) %>%
+  gt(rowname_col = "cat_age") %>%
+  grand_summary_rows(
+    columns = 3:5,
+    fns = list(Ensemble = ~ wtd.mean(., w =tot)),
+    fmt = ~fmt_percent(.x, decimals = 0)
+  ) %>%
+  fmt_percent(columns = 3:5,
+              decimals = 0) %>%
+  tab_stubhead("Catégorie d'âge") %>%
+  tab_spanner(columns = 3:5,
+              "Type de famille (en %)") %>%
+  cols_hide("tot") %>%
+  tab_header("Typologie des familles par classe d'âge en 2003") %>%
+  tab_footnote(md("Lecture : en 2003, 7% des personnes âgées de 31 à 60 ans n'avaient pas de frères et soeurs. Dans l'ensemble, 9% de la population française toutes catégories d'âge confondues n'avaient pas de frères et soeurs \\
+  Champ : Individus de 18 ans et plus habitant en France métropolitaine \\
+                  Source : Histoire de Vie 2003 | A. POISSONNIER | 2023")) |>
+  cols_width(
+    is.numeric ~ px(120),
+    is.factor ~ px(180))
+```
+
+# Analyser visuellement les données
+
+Remarque : ne pas s'inquiéter si vous recevez un message d'erreur indiquant
+
+```         
+The following aesthetics were dropped during statistical transformation: weight
+```
+
+## Boîte à moustaches
+
+Revenez sur le TP et le corrigé de la troisième séance si le fonctionnement du package `ggplot2` n'est plus clair pour vous. À l'aide des fonctions `ggplot` et `geom_boxplot`, construisez une boîte à moustache représentant la distribution du nombre d'heures passées devant la télévision `heures.tv`. N'oubliez pas d'utiliser l'argument `weight =` pour spécifier les poids à utiliser.
+
+-   Moins de combien d'heures environ passent devant la télévision les 50% de la population qui regardent le moins la télévision ?
+
+-   Au moins combien d'heures environ passent devant la télévision les 25% de la population qui regardent le plus la télévision ?
+
+-   Environ combien d'heures au minimum et combien d'heures au maximum faut-il regarder la télévision pour faire partie des 50% de la population qui a une consommation intermédiaire (= ne fait pas partie des 25% qui passent le moins de temps devant la télé, ni des 25% qui passent le plus de temps devant la télé)
+
+```{r}
+ggplot(hdv2003) +
+  geom_boxplot(aes(x = heures.tv,
+                   weight = poids))
+```
+
+Construire un graphique similaire où le temps passé devant la télé est représenté sur l'axe des abscisses en fonction du niveau de qualification renseigné par la variable `qualif`
+
+```{r}
+ggplot(hdv2003) +
+  geom_boxplot(aes(x = heures.tv,
+                   y = qualif,
+                   weight = poids))
+```
+
+Construire un graphique similaire où le temps passé devant la télé est représenté sur l'axe des ordonnées en fonction du niveau de qualification renseigné par la variable `qualif`
+
+```{r}
+ggplot(hdv2003) +
+  geom_boxplot(aes(y = heures.tv,
+                   x = qualif,
+                   weight = poids))
+```
+
+Construire un graphique similaire où le temps passé devant la télé est représenté sur l'axe des abscisses en fonction du niveau de qualification renseigné par la variable `qualif` , cette-fois ci en excluant au préalable les enquêté·es qui ont un niveau de qualification égal à "Autre" ou "NA". Il faudra utiliser la fonction `filter`, n'oubliez pas que l'on peut utiliser l'opérateur `%>%` pour transformer le tableau de données avant de l'envoyer dans la fonction `ggplot`.
+
+```{r}
+hdv2003 %>%
+  filter(qualif != "Autre" &
+           qualif != "NA") %>%
+  ggplot() +
+  geom_boxplot(aes(x = heures.tv,
+                   y = qualif,
+                   weight = poids))
+```
+
+Remarque : Les valeurs manquantes sont parfois codées sous forme logique `NA` plutôt que sous forme de texte. Il faut normalement utiliser la fonction `is.na` pour faire un test logique `!is.na(qualif)` qui les exclue. Le `!` est très important car `is.na(qualif)` retournerait toutes les lignes pour lesquelles la variable `qualif` prend la valeur logique `NA`, alors que nous voulons l'inverse ! Le verbe `filter` comprend quand même qu'il faut supprimer les `NA` logiques de `qualif` si vous utilisez le test `qualif != "NA"` normalement adapté au codage des valeurs manquantes sous forme de texte, en tant que modalité à part entière du facteur étudié.
+
+Reprenez votre code et à l'aide de la fonction `lims`, recentrez le graphique pour que l'axe des abscisses aillent de 0 heures à 8 heures passées devant la télé.
+
+```{r}
+hdv2003 %>%
+  filter(qualif != "Autre" &
+           qualif != "NA") %>%
+  ggplot() +
+  geom_boxplot(aes(x = heures.tv,
+                   y = qualif,
+                   weight = poids)) +
+  lims(x = c(0, 8))
+```
+
+Reprenez votre code et ajoutez à l'aide de la fonction `labs` un titre au graphique, un intitulé pour l'axe des ordonnées et l'axes des abscisses, une légende précisant une note de lecture, le champ et la source (origine des données/auteur·e/date). **Astuce : si le texte dépasse du graphique, vous pouvez ajoutez "\\n" au milieu de votre texte pour qu'il y ait un retour à la ligne.**
+
+```{r}
+hdv2003 %>%
+  filter(qualif != "Autre" &
+           qualif != "NA") %>%
+  ggplot() +
+  geom_boxplot(aes(x = heures.tv,
+                   y = qualif,
+                   weight = poids)) +
+  lims(x = c(0, 8)) +
+  labs(title = "Nombre d'heures passées par jour devant la télévision selon le niveau\nde qualification",
+       x = "Heures passées devant la télévision",
+       y = "Niveau de qualification",
+       caption = "Note de lecture : 50% des cadres passent moins d'environ une heure et demie devant la télévision,\n25% passent moins d'environ 1 heures et quart, 25% passent plus d'environ 2 heures
+       Source : Histoire de vie 2003 | A. POISSONNIER | 2023")
+```
+
+## Diagrammes en bâton
+
+### Effectifs absolus
+
+Utilisez les fonctions `ggplot` et `geom_bar` pour représenter la distribution du niveau de qualification `qualif`. N'oubliez à nouveau pas les poids et retirez préalablement les enquêté·es pour qui `qualif` vaut "Autre" ou "NA" à l'aide la fonction `filter`.
+
+```{r}
+hdv2003 %>%
+  filter(qualif != "Autre" &
+           qualif != "NA") %>%
+  ggplot() +
+  geom_bar(aes(x = qualif,
+               weight = poids))
+```
+
+Rajoutez l'argument `fill` **en dehors de la fonction `aes`** pour colorer toutes les barres en rouge.
+
+```{r}
+hdv2003 %>%
+  filter(qualif != "Autre" &
+           qualif != "NA") %>%
+  ggplot() +
+  geom_bar(aes(x = qualif,
+               weight = poids),
+           fill = "red")
+```
+
+Réessayez en ajoutant maintenant l'argument `fill` **à l'intérieur d'`aes`** pour colorer les barres en fonction du sexe (variable `sexe`)
+
+```{r}
+hdv2003 %>%
+  filter(qualif != "Autre" &
+           qualif != "NA") %>%
+  ggplot() +
+  geom_bar(aes(x = qualif,
+               fill = sexe,
+               weight = poids))
+```
+
+Construisez un diagramme en bâtons où le sexe **apparaît en abscisse** et le niveau de qualification **apparaît sous forme de couleur.**
+
+```{r}
+hdv2003 %>%
+  filter(qualif != "Autre" &
+           qualif != "NA") %>%
+  ggplot() +
+  geom_bar(aes(x = sexe,
+               fill = qualif,
+               weight = poids))
+```
+
+Reprenez votre code et ajoutez l'argument `position = "dodge"` **en dehors d'`aes`** pour décaler les bâtons de chaque niveau de qualification. Commentez le graphique obtenu.
+
+```{r}
+hdv2003 %>%
+  filter(qualif != "Autre" &
+           qualif != "NA") %>%
+  ggplot() +
+  geom_bar(aes(x = sexe,
+               fill = qualif,
+               weight = poids),
+           position = "dodge")
+```
+
+### Pourcentages
+
+Réalisez le même diagramme en bâtons que précédemment, qui représente le sexe en abscisse et qui distingue le niveau de qualification par couleur mises côte-à-côte, en représentant cette fois-ci des pourcentages plutôt que des effectifs absolus. Il faudra à nouveau utiliser l'opérateur `%>%` pour enchaîner les transformations, associé aux fonctions `count`, `group_by` et `mutate`. Aidez-vous des codes présentés dans la troisième séance et rappelez vous qu'**il faudra spécifier la hauteur des barres avec l'argument `y = p`**, p étant le nom de la colonne des pourcentages, **et ajouter en dehors d'`aes`** **l'arguement `stat = "identity"`***,* ce qui indique à `geom_bar` que les pourcentages doivent être représentés comme tels car vous avez déjà fait les calculs à la main.
+
+```{r}
+hdv2003 %>%
+  filter(qualif != "Autre" &
+           qualif != "NA") %>%
+  count(sexe, qualif, wt = poids) %>%
+  group_by(sexe) %>%
+  mutate(p = n/sum(n)) %>%
+  ungroup() %>%
+  ggplot() +
+  geom_bar(aes(x = sexe,
+               y = p,
+               fill = qualif),
+           stat = "identity",
+           position = "dodge")
+```
+
+## Nuage de points et graphique linéaire
+
+Construisez un nuage de points avec `geom_point` dans lequel la variable `age` est en abscisse et la variable `heures.tv` en ordonnées. Par définition, on ne peut spécifier de poids dans cette représentation.
+
+```{r}
+ggplot(hdv2003) +
+  geom_point(aes(x = age,
+                 y = heures.tv))
+```
+
+Utilisez maintenant `geom_count` à la place de `geom_point` et spécifiez bien l'argument `weight =`. Que permet de faire cette fonction ?
+
+```{r}
+ggplot(hdv2003) +
+  geom_count(aes(x = age,
+                 y = heures.tv,
+                 weight = poids))
+```
+
+Trouvez-vous ces deux visualisations graphiques lisibles et convaincantes ? Pourquoi ?
+
+Le code ci-dessous crée une variable `age5` correspondant à des classes d'âges de 5 ans, sauf la dernière regroupant les personnes de 76 ans et plus. Complétez ce code avec l'opérateur `%>%`, les fonctions `group_by`, `summarize` et `wtd.mean` pour calculer la moyenne pondérée d'heures passées à la télévision **par classe d'âge**. Vous apellerez la colonne créée dans `summarize` `heures.tv`, et `tab` doit être un tableau de 2 colonnes (`age5` et `heures.tv` avec une ligne par classe d'âge).
+
+```{r}
+tab <- 
+  hdv2003 %>%
+  mutate(age5 = 
+           cut(age,
+               breaks = c(seq(15, 75, 5), 120))
+         ) %>%
+  group_by(age5) %>%
+  summarize(heures.tv = wtd.mean(heures.tv, poids))
+```
+
+Lancez maintenant ce bloc de code et commentez le graphique.
+
+```{r}
+tab %>%
+  ggplot() +
+  geom_line(aes(x = age5,
+                group = 1,
+                y = heures.tv))
+```
+
+## Nuage d'étiquettes ou de texte
+
+Calculez à l'aide des fonctions `group_by` et `summarize` et `wtd.mean` les moyennes d'âge **et** d'heures passées devant la télévision pour chaque statut d'occupation (variable `occup`). Utilisez `ggplot` et `geom_label` pour créer un nuage d'étiquettes plaçant chaque statut d'occupation (étudiant·e, retraité·e etc) dans un plan où l'âge sera en abscisse et le nombre d'heures en ordonnée. Copiez votre code et voyez ce qui diffère en remplaçant `geom_label` par `geom_text`. Commentez le graphique.
+
+```{r}
+hdv2003 %>%
+  group_by(occup) %>%
+  summarize(
+    heures.tv = wtd.mean(heures.tv, poids),
+    age = wtd.mean(age, poids)) %>%
+  ggplot() + 
+  geom_label(aes(x = age,
+                y = heures.tv,
+                label = occup))
+```
+
+# Mener une démonstration associant statistiques descriptives et visualisation des données
+
+Proposez ici une petite démonstration associant au moins 2 statistiques descriptives et une visualisation des données. Il faudra croiser au moins 2 dimensions (le niveau de qualification et le rapport au travail par exemple).
+
+```{r}
+
+```
