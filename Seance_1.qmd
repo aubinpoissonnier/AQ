@@ -680,8 +680,14 @@ On charge ici deux tableaux de données, `deces_f` pour les femmes et `deces_h` 
 
 ```{r}
 # Chargement du tableau de données
-dec_f <- read.csv2("data/deces_f.csv")
-dec_h <- read.csv2("data/deces_h.csv")
+dec_f <- aws.s3::s3read_using(FUN = data.table::fread,
+                           object = "/diffusion/deces_f.csv",
+                           bucket = "aubinpoissonnier",
+                           opts = list("region" = ""))
+dec_h <- aws.s3::s3read_using(FUN = data.table::fread,
+                           object = "/diffusion/deces_h.csv",
+                           bucket = "aubinpoissonnier",
+                           opts = list("region" = ""))
 ```
 
 ### Exploration du tableau de données
@@ -793,7 +799,10 @@ On charge maintenant les tables de mortalité de 2019 fournies par l'INSEE. C'es
 
 ```{r}
 # Chargement des données
-mort <- read.csv2("data/tab_mort19.csv")
+mort <- aws.s3::s3read_using(FUN = data.table::fread,
+                           object = "/diffusion/tab_mort19.csv",
+                           bucket = "aubinpoissonnier",
+                           opts = list("region" = ""))
 ```
 
 ### Exploration du tableau
