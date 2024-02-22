@@ -1,0 +1,17 @@
+---
+title: "Séance 2"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+#| include: false
+rp <- aws.s3::s3read_using(FUN = data.table::fread,
+                      object = "/diffusion/RP/rp69_2017.csv",
+                           bucket = "aubinpoissonnier",
+                           opts = list("region" = ""))
+```
+
+# Catégoriser
