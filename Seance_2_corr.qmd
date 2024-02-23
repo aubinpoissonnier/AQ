@@ -14,4 +14,138 @@ rp <- aws.s3::s3read_using(FUN = data.table::fread,
                            opts = list("region" = ""))
 ```
 
-# Catégoriser
+# Compter avec des variables catégorielles
+
+Vous travaillez ici avec les données du recensement anonymisées, publiées sous forme d'un fichier comportant une ligne par individu. La base `rp` correspond au recensement de 2017 pour le département du rhône.
+
+## Tri à plat et tri croisé
+
+### Compter les effectifs absolus
+
+La fonction `table` fait partie des fonctions intégrées au R de base. Elle permet de réaliser des tris à plat sur un vecteur et des tris croisés sur deux vecteurs.
+
+Le tableau `rp` contient une colonne `sexe` qui correspond à la variable qui vaut 1 si l'individu recensé est un homme et 2 si l'individu est une femme. On peut compter le nombre d'hommes et de femmes :
+
+```{r}
+table(rp$sexe)
+```
+
+On peut aussi connaître le nombre de personnes en couple grâce à la colonne `couple`
+
+```{r}
+table(rp$couple)
+```
+
+### Calculer les pourcentages
+
+Souvent, on cherche plutôt à obtenir des pourcentages que des effectifs absolus. La fonction `proportions` permet de calculer la part associée chaque modalité de la variable. Elle s'applique à l'objet créé par la fonction `table`.
+
+La part d'hommes/de femmes dans la population du département du Rhône
+
+```{r}
+tab_sexe <- table(rp$sexe)
+proportions(tab_sexe)
+```
+
+La part de personnes en couple
+
+```{r}
+tab_couple <- table(rp$couple)
+proportions(tab_couple)
+```
+
+On peut encore modifier ce tableau pour faciliter la lecture, par exemple en convertissant cette proportion en pourcentages
+
+```{r}
+# En décomposant ligne par ligne
+tab_sexe <- table(rp$sexe)
+tab_sexe <- proportions(tab_sexe)
+tab_sexe <- tab_sexe*100
+tab_sexe <- round(tab_sexe, 2)
+tab_sexe
+
+# En cumulant les fonctions
+tab_sexe <- proportions(table(rp$sexe))
+tab_sexe <- round(tab_sexe*100, 2)
+tab_sexe
+```
+
+### Croiser des variables
+
+Pour croiser deux variables, il suffit d'ajouter la deuxième colonne comme deuxième argument. La part d'hommes et de femmes en couple :
+
+```{r}
+tab_sexe_couple <- table(rp$sexe, rp$couple)
+tab_sexe_couple
+```
+
+Pour les tableaux croisés, les fonctions `lprop` et `rprop` permettent d'obtenir très facilement les pourcentages en ligne ou en colonne ainsi que les marges.
+
+# Le recodage sur R
+
+## Tests et comparaison {#sec-tests}
+
+Un test est une opération logique de comparaison qui renvoie vrai (`TRUE`) ou faux (`FALSE`) pour chacun des éléments d'un vecteur.
+
+Parmi les opérateurs de comparaison disponibles, on trouve notamment :
+
+-   `==` qui teste l'égalité
+-   `!=` qui teste la différence
+-   `>`, `<`, `<=`, `>=` qui testent la supériorité ou l'infériorité
+-   `%in%` qui teste l'appartenance à un ensemble de valeurs
+
+Exemple le plus simple :
+
+```{r}
+2 == 3
+```
+
+```{r}
+2 != 3
+```
+
+Exemple appliqué à un vecteur :
+
+```{r}
+x <- 1:10
+x < 5
+```
+
+On peut combiner plusieurs tests avec les opérateurs logiques *et* (`&`) et *ou* (`|`). Ainsi, si on veut tester qu'une valeur est comprise entre 3 et 6 inclus, on peut faire :
+
+```{r}
+x >= 3 & x <= 6
+```
+
+Si on veut tester qu'une valeur est égale à "Bleu" ou à "Vert", on peut faire :
+
+```{r}
+vec <- c("Jaune", "Jaune", "Rouge", "Vert")
+vec == "Jaune" | vec == "Vert"
+```
+
+À noter que dans ce cas, on peut utiliser l'opérateur `%in%`[^1], qui teste si une valeur fait partie des éléments d'un vecteur :
+
+[^1]: Pour accéder à la page de documentation de fonctions comme `%in%`, on ne peut pas utiliser `?%in%`, qui renvoie une erreur. Vous pouvez faire `?"%in%"`, `help("%in%")` ou, dans ce cas, `?match`, car les deux fonctions sont documentées sur la même page d'aide.
+
+```{r}
+vec %in% c("Jaune", "Vert")
+```
+
+::: callout-warning
+Attention, si on souhaite tester si une valeur `x` est inconnue (ou 'manquante'), c'est-à-dire si elle est codée `NA` (*Not Available*), faire le test `x == NA` *ne donnera pas le résultat escompté*. En effet, fidèle à sa réputation de rigueur informaticienne, pour R `NA == NA` ne vaut pas `TRUE` mais... `NA` (on ne sait pas si une valeur inconnue est égale à une autre valeur inconnue).
+
+Pour tester si une valeur est inconnue (`NA`), il faut utiliser la fonction dédiée `is.na` et faire `is.na(x)`.
+
+Cependant, par convention, `NA %in% NA` vaut `TRUE`.
+:::
+
+Enfin, on peut inverser un test avec l'opérateur *non* (`!`) :
+
+```{r}
+!(vec %in% c("Jaune", "Vert"))
+```
+
+```{r}
+
+```
