@@ -16,7 +16,7 @@ rp <- aws.s3::s3read_using(FUN = data.table::fread,
 
 # Compter avec des variables catégorielles
 
-Vous travaillez ici avec les données du recensement anonymisées, publiées sous forme d'un fichier comportant une ligne par individu. La base `rp` correspond au recensement de 2017 pour le département du rhône.
+Vous travaillez ici avec les données du recensement anonymisées, publiées sous forme d'un fichier comportant une ligne par individu. La base `rp` correspond au recensement de 2017 pour le département du rhône. Le dictionnaire des codes est disponible à [cette adresse](https://www.insee.fr/fr/statistiques/4802064?sommaire=4508161#dictionnaire).
 
 ## Tri à plat et tri croisé
 
@@ -79,11 +79,36 @@ tab_sexe_couple <- table(rp$sexe, rp$couple)
 tab_sexe_couple
 ```
 
-Pour les tableaux croisés, les fonctions `lprop` et `rprop` permettent d'obtenir très facilement les pourcentages en ligne ou en colonne ainsi que les marges.
+Pour les tableaux croisés, les fonctions `lprop` et `cprop` du package `questionr` permettent d'obtenir très facilement les pourcentages en ligne ou en colonne ainsi que les marges.
+
+```{r}
+library(questionr)
+
+rprop(tab_sexe_couple)
+cprop(tab_sexe_couple)
+```
 
 # Le recodage sur R
 
+## Changer la nature d'une colonne
+
+Le premier type de recodage consiste à changer la nature d'une colonne. On vérifie la nature d'une colonne avec la fonction `class` et on peut la modifier avec les fonctions de la forme `as.nature_désirée` : `as.integer`, `as.character` etc.
+
+```{r}
+class(rp$agerev)
+rp$agerev <- as.numeric(rp$agerev)
+class(rp$agerev)
+```
+
+```{r}
+class(rp$sexe)
+rp$sexe <- as.factor(rp$sexe)
+class(rp$sexe)
+```
+
 ## Tests et comparaison {#sec-tests}
+
+L'essentiel du recodage s'opère avec des instructions logiques simples (égal, différent, inférieur ou supérieur à) que l'on peut combiner sur une variable ou plusieurs variables). On utilise pour cela des tests.
 
 Un test est une opération logique de comparaison qui renvoie vrai (`TRUE`) ou faux (`FALSE`) pour chacun des éléments d'un vecteur.
 
@@ -146,6 +171,10 @@ Enfin, on peut inverser un test avec l'opérateur *non* (`!`) :
 !(vec %in% c("Jaune", "Vert"))
 ```
 
-```{r}
+### Recoder une variable
 
+Présentation de `if_else`, `case_when`, `irec` et `fct_recode`
+
+```{r}
+library(tidyverse)
 ```
