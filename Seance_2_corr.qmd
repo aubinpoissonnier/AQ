@@ -9,7 +9,7 @@ editor_options:
 ```{r}
 #| include: false
 rp <- aws.s3::s3read_using(FUN = data.table::fread,
-                      object = "/diffusion/RP/rp69_2017.csv",
+                           object = "/diffusion/RP/rp69_2017.csv",
                            bucket = "aubinpoissonnier",
                            opts = list("region" = ""))
 ```
@@ -171,10 +171,114 @@ Enfin, on peut inverser un test avec l'opérateur *non* (`!`) :
 !(vec %in% c("Jaune", "Vert"))
 ```
 
-### Recoder une variable
-
-Présentation de `if_else`, `case_when`, `irec` et `fct_recode`
+## Le recodage sous condition
 
 ```{r}
 library(tidyverse)
 ```
+
+
+La fonction ifelse permet de faire une action sous condition : si l'âge est supérieur à 18, donne la valeur "majeur.e", sinon donne la valeur "mineur.e". case_when étend ce fonctionnement à plus d'une possibilité : si l'âge est supérieur à 18 donne "majeur.e", si l'âge est compris entre 18 et 64 donne "adulte", si l'âge est supérieur à 64 donne "senior".
+
+Il faut associer ces fonctions à d'autres fonctions qui disent à R quoi faire avec le tableau. La fonction mutate permet de créer une nouvelle colonne. On pourra dire à R : crée une nouvelle colonne (mutate) à partir d'un test sur la valeur initiale de la variable (ifelse).
+
+
+```{r}
+# Voici deux versions du codage de l'âge des personnes recensées, soit la variable agerev. La première est lisible, la deuxième est commentée ligne par ligne.
+
+# Version plus lisible sans les commentaires
+rp <- mutate(
+  rp,
+  age_rec = 
+    ifelse(
+      agerev > 17,
+      "Majeur.e",
+      "Mineur.e"
+    )
+)
+
+# Version commentée
+rp <-
+  # J'utilise la fonction mutate pour créer une colonne
+  mutate(
+    # Le premier argument de mutate, le tableau à transformer
+    rp,
+    # Le deuxième argument de mutate, le nom de la colonne à créer (à gauche du =) et la valeur que je lui donne (à droite du =)
+    age_rec = 
+      # Elle sera créée à l'aide du test opérée par la fonction ifelse
+      ifelse(
+        # Le premier argument de ifelse, la condition
+        agerev > 17,
+        # Le deuxième argument de ifelse, la valeur à donner si la condition est vérifiée
+        "Majeur.e", 
+        # Le troisième argument de ] ifelse, la valeur à donner si la condition n'est pas vérifié
+        "Mineur.e"
+        # Je ferme la parenthèse de la fonction ifelse
+      )
+    # Je ferme la parenthèse de la fonction mutate
+  ) 
+
+# On obtient bien une nouvelle variable/colonne nommée age_rec qui prend soit la valeur "Mineur.e", soit la valeur "Majeur.e"
+```
+
+Dès qu'on veut utiliser plus d'un test (par exemple, obtenir trois valeurs : mineur.e, adulte, senior), il faut utiliser la fonction case_when.
+
+```{r}
+# Version lisible
+rp <- 
+  mutate(
+  rp,
+  age_rec =
+    case_when(
+      agerev < 18 ~ "Mineur.e",
+      agerev > 17 & agerev < 65 ~ "Adulte",
+      agerev > 64 ~ "Senior"
+    )
+)
+
+
+# Version commentée
+rp <-
+  # Je crée une variable grâce à la fonction mutat
+  mutate(
+    # Le premier argument, je transforme le tableau rp
+    rp,
+    # Le deuxième argument, la variable à créer
+    age_rec = 
+      # Qui sera créee grâce à la fonction case_when
+      case_when(
+        # À gauche du "~", c'est la condition, à droite la valeur
+        # Si agerev est strictement inférieur à 18, alors la variable prendra la valeur "Mineur.e"
+        agerev < 18 ~ "Mineur.e",
+        # Si agerev est strictement supérieur à 17 ET qu'agerev est strictement inférieur à 65, alors la variable prendra la valeur "Adulte"
+        agerev > 17 & agerev < 65 ~ "Adulte",
+         # Si agerev est strictement supérieur à 64, alors la variable prendra la valeur "Senior"
+        agerev > 64 ~ "Senior"
+        # Je ferme la parenthèse de la fonction case_when
+      )
+     # Je ferme la parenthèse de la fonction mutate
+  )
+```
+
+Nous n'avons pas spécifié la nature de notre nouvelle colonne/vecteur. On cherche ici à créer un facteur puisqu'on a une variable catégorielle. La fonction ``fct` permet de créer un vecteur et de spécifier l'ordre de ses modalités (quand on fera des tableaux ou des graphiques, on voudra que "Senior" apparaisse en dernier, et non entre "Mineur.e" et "Majeur.e" 
+```{r}
+# Un vecteur de type texte qui renseigne la catégorie d'âge de 6 personnes
+cat_age <- c("Mineur.e", 
+             "Adulte", 
+             "Adulte", 
+             "Senior", 
+             "Mineur.e",
+             "Senior")
+# Le tri croisé ne donne pas quelque chose d'intuitif :
+table(cat_age)
+# La catégorie adulte apparaît avant mineur.e
+# On le transforme en facteur
+cat_age <-
+  fct(cat_age, # Le premier argument, le facteur à transformer
+      levels = # Le deuxième argument, les modalités (levels) avec l'ordre d'apparition 
+        c("Mineur.e", "Adulte", "Senior")
+      )
+# Le problème est résolu
+table(cat_age)
+```
+
