@@ -8,6 +8,9 @@ editor_options:
 
 ```{r}
 #| include: false
+
+library(questionr)
+library(tidyverse)
 rp <- aws.s3::s3read_using(FUN = data.table::fread,
                            object = "/diffusion/RP/rp69_2017.csv",
                            bucket = "aubinpoissonnier",
@@ -36,6 +39,12 @@ On peut aussi connaître le nombre de personnes en couple grâce à la colonne `
 table(rp$couple)
 ```
 
+Quand les données sont livrées avec des poids d'échantillonnage, on peut utiliser la fonction `wtd.table` pour calculer des effectifs pondérés.
+
+```{r}
+wtd.table(rp$sexe, weights = rp$ipondi)
+```
+
 ### Calculer les pourcentages
 
 Souvent, on cherche plutôt à obtenir des pourcentages que des effectifs absolus. La fonction `proportions` permet de calculer la part associée chaque modalité de la variable. Elle s'applique à l'objet créé par la fonction `table`.
@@ -43,14 +52,14 @@ Souvent, on cherche plutôt à obtenir des pourcentages que des effectifs absolu
 La part d'hommes/de femmes dans la population du département du Rhône
 
 ```{r}
-tab_sexe <- table(rp$sexe)
+tab_sexe <- wtd.table(rp$sexe, weights = rp$ipondi)
 proportions(tab_sexe)
 ```
 
 La part de personnes en couple
 
 ```{r}
-tab_couple <- table(rp$couple)
+tab_couple <- wtd.table(rp$couple, weights = rp$ipondi)
 proportions(tab_couple)
 ```
 
@@ -58,14 +67,14 @@ On peut encore modifier ce tableau pour faciliter la lecture, par exemple en con
 
 ```{r}
 # En décomposant ligne par ligne
-tab_sexe <- table(rp$sexe)
+tab_sexe <- wtd.table(rp$sexe, weights = rp$ipondi)
 tab_sexe <- proportions(tab_sexe)
 tab_sexe <- tab_sexe*100
 tab_sexe <- round(tab_sexe, 2)
 tab_sexe
 
 # En cumulant les fonctions
-tab_sexe <- proportions(table(rp$sexe))
+tab_sexe <- proportions(wtd.table(rp$sexe, weights = rp$ipondi))
 tab_sexe <- round(tab_sexe*100, 2)
 tab_sexe
 ```
@@ -75,7 +84,7 @@ tab_sexe
 Pour croiser deux variables, il suffit d'ajouter la deuxième colonne comme deuxième argument. La part d'hommes et de femmes en couple :
 
 ```{r}
-tab_sexe_couple <- table(rp$sexe, rp$couple)
+tab_sexe_couple <- wtd.table(rp$sexe, rp$couple, weights = rp$ipondi)
 tab_sexe_couple
 ```
 
@@ -86,6 +95,12 @@ library(questionr)
 
 rprop(tab_sexe_couple)
 cprop(tab_sexe_couple)
+```
+
+## Exercices
+
+```{r}
+
 ```
 
 # Le recodage sur R
@@ -177,11 +192,9 @@ Enfin, on peut inverser un test avec l'opérateur *non* (`!`) :
 library(tidyverse)
 ```
 
-
 La fonction ifelse permet de faire une action sous condition : si l'âge est supérieur à 18, donne la valeur "majeur.e", sinon donne la valeur "mineur.e". case_when étend ce fonctionnement à plus d'une possibilité : si l'âge est supérieur à 18 donne "majeur.e", si l'âge est compris entre 18 et 64 donne "adulte", si l'âge est supérieur à 64 donne "senior".
 
 Il faut associer ces fonctions à d'autres fonctions qui disent à R quoi faire avec le tableau. La fonction mutate permet de créer une nouvelle colonne. On pourra dire à R : crée une nouvelle colonne (mutate) à partir d'un test sur la valeur initiale de la variable (ifelse).
-
 
 ```{r}
 # Voici deux versions du codage de l'âge des personnes recensées, soit la variable agerev. La première est lisible, la deuxième est commentée ligne par ligne.
@@ -260,7 +273,8 @@ rp <-
   )
 ```
 
-Nous n'avons pas spécifié la nature de notre nouvelle colonne/vecteur. On cherche ici à créer un facteur puisqu'on a une variable catégorielle. La fonction ``fct` permet de créer un vecteur et de spécifier l'ordre de ses modalités (quand on fera des tableaux ou des graphiques, on voudra que "Senior" apparaisse en dernier, et non entre "Mineur.e" et "Majeur.e" 
+Nous n'avons pas spécifié la nature de notre nouvelle colonne/vecteur. On cherche ici à créer un facteur puisqu'on a une variable catégorielle. La fonction \``fct` permet de créer un vecteur et de spécifier l'ordre de ses modalités (quand on fera des tableaux ou des graphiques, on voudra que "Senior" apparaisse en dernier, et non entre "Mineur.e" et "Majeur.e"
+
 ```{r}
 # Un vecteur de type texte qui renseigne la catégorie d'âge de 6 personnes
 cat_age <- c("Mineur.e", 
@@ -281,4 +295,3 @@ cat_age <-
 # Le problème est résolu
 table(cat_age)
 ```
-
