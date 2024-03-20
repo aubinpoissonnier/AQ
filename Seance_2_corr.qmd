@@ -132,25 +132,8 @@ tab_etud <- wtd.table(rp$etud, rp$sexe, weights = rp$ipondi)
 rprop(tab_etud)
 ```
 
-# Le recodage sur R
 
-## Changer la nature d'une colonne
-
-Le premier type de recodage consiste à changer la nature d'une colonne. On vérifie la nature d'une colonne avec la fonction `class` et on peut la modifier avec les fonctions de la forme `as.nature_désirée` : `as.integer`, `as.character` etc.
-
-```{r}
-class(rp$agerev)
-rp$agerev <- as.numeric(rp$agerev)
-class(rp$agerev)
-```
-
-```{r}
-class(rp$sexe)
-rp$sexe <- as.factor(rp$sexe)
-class(rp$sexe)
-```
-
-## Tests et comparaison {#sec-tests}
+# Tests et comparaison {#sec-tests}
 
 L'essentiel du recodage s'opère avec des instructions logiques simples (égal, différent, inférieur ou supérieur à) que l'on peut combiner sur une variable ou plusieurs variables). On utilise pour cela des tests.
 
@@ -256,11 +239,88 @@ rp$immi == 1 &
   rp$stocd != 10
 ```
 
-## Le recodage sous condition
+# Le tidyverse
+
+Le terme *tidyverse* est une contraction de *tidy* (qu'on pourrait traduire par "bien rangé") et de *universe*. Il s'agit en fait d'une collection d'extensions conçues pour travailler ensemble et basées sur une philosophie commune :
+
+-   `ggplot2` (visualisation)
+-   `dplyr` (manipulation des données)
+-   `tidyr` (remise en forme des données)
+-   `purrr` (programmation)
+-   `readr` (importation de données)
+-   `tibble` (tableaux de données)
+-   `forcats` (variables qualitatives)
+-   `stringr` (chaînes de caractères)
+-   `lubridate` (manipulation de dates)
+
+Un des objectifs de ces extensions est de fournir des fonctions avec une syntaxe cohérente, qui fonctionnent bien ensemble, et qui retournent des résultats prévisibles. Nous allons recourrir à cette syntaxe pour transformer nos données.
+
+## Filtrer des lignes et sélectionner des colonnes
+### `filter`
+`filter` sélectionne des lignes d'une table selon une condition. On lui passe en paramètre un test, et seules les lignes pour lesquelles ce test renvoie `TRUE` (vrai) sont conservées. On réutilise donc les opérateurs logiques vus dans le cas des tests. Puisque le premier argument est le tableau en lui-même, il n'est plus nécessaire d'utiliser l'opérateur `$` et il suffit d'utiliser le nom dans colonnes pour filter. 
+
+```{r}
+# Filtre pour sélectionner les femmes
+rp_f <- filter(rp, sexe == 2)
+
+# Filtre pour sélectionner les femmes immigrées
+rp_f <- filter(rp, sexe == 2 & immi = 1)
+```
+
+On peut également placer des fonctions dans les tests, qui nous permettent par exemple de sélectionner les personnes qui sont plus âgées que l'âge médian.
+
+```{r}
+rp_senior <- filter(rp, agerev > median(agerev))
+```
+
+### `select`
+
+`select` permet de sélectionner des colonnes d'un tableau de données. 
+
+```{r}
+# Sélectionner uniquement les colonnes du sexe et de l'âge
+select(rp, sexe, agerev)
+```
+
+Si on fait précéder le nom d'un `-`, la colonne est éliminée plutôt que sélectionnée :
+
+```{r}
+# Sélectionner toutes les colonnes sauf le sexe et l'âge
+select(airports, -sexe, -age)
+```
+
+## Créer une colonne et recoder sous conditions
+### `mutate`
+La fonction `mutate` permet de créer une nouvelle colonne. C'est une alternative à la méthode de base avec l'opétaeur $.
+Le premier type de recodage consiste à changer la nature d'une colonne. On vérifie la nature d'une colonne avec la fonction `class` et on peut la modifier avec les fonctions de la forme `as.nature_désirée` : `as.integer`, `as.character` etc.
+
+
+```{r}
+# Vérifier la nature de la variable
+class(rp$agerev)
+
+# On transforme cette colonne en format texte
+# Ancienne solution avec l'opérateur $
+rp$agerev_txt <- as.character(rp$agerev)
+class(rp$agerev_txt)
+
+# Nouvelle solution avec la fonction mutate
+# Attention : on transforme le tableau de données, plus seulement une colonne
+# À nouveau, on fait directement référence au nom des colonnes
+rp <-
+  mutate(
+    # Le premier argument est le tableau à modifié
+    rp,
+    # Le deuxième la variable à créer : son nom puis son contenu
+    agerev_txt = as.character(agerev)
+  )
+```
+
+### `if_else`
 
 La fonction `if_else` permet de faire une action sous condition : si l'âge est supérieur à 18, donne la valeur "majeur.e", sinon donne la valeur "mineur.e". case_when étend ce fonctionnement à plus d'une possibilité : si l'âge est supérieur à 18 donne "majeur.e", si l'âge est compris entre 18 et 64 donne "adulte", si l'âge est supérieur à 64 donne "senior".
 
-Il faut associer ces fonctions à d'autres fonctions qui disent à R quoi faire avec le tableau. La fonction `mutate` permet de créer une nouvelle colonne. On pourra dire à R : crée une nouvelle colonne (`mutate`) à partir d'un test sur la valeur initiale de la variable (`if_else`).
+On pourra dire à R : crée une nouvelle colonne (`mutate`) à partir d'un test sur la valeur initiale de la variable (`if_else`).
 
 ```{r}
 # Voici deux versions du codage de l'âge des personnes recensées, soit la variable agerev. La première est lisible, la deuxième est commentée ligne par ligne.
@@ -299,6 +359,8 @@ rp <-
 
 # On obtient bien une nouvelle variable/colonne nommée age_rec qui prend soit la valeur "Mineur.e", soit la valeur "Majeur.e"
 ```
+
+### `case_when`
 
 Dès qu'on veut utiliser plus d'un test (par exemple, obtenir trois valeurs : mineur.e, adulte, senior), il faut utiliser la fonction case_when.
 
@@ -339,6 +401,8 @@ rp <-
   )
 ```
 
+
+### `fct` 
 Nous n'avons pas spécifié la nature de notre nouvelle colonne/vecteur. On cherche ici à créer un facteur puisqu'on a une variable catégorielle. La fonction `fct` permet de créer un vecteur et de spécifier l'ordre de ses modalités (quand on fera des tableaux ou des graphiques, on voudra que "Senior" apparaisse en dernier, et non entre "Mineur.e" et "Majeur.e"
 
 ```{r}
@@ -369,6 +433,11 @@ La fonction `irec` permet de réaliser ces recodages par le biais d'une interfac
 1.  Créez une variable catégorielle à deux modalités : Immigré/Non immigré
 
 2.  Créez une variable catégorielle à trois modalités : Immigré étranger/immigré français/français non immigré
+
+```{r}
+
+```
+
 
 # La visualisation de données avec ggplot2 - La logique additive
 
