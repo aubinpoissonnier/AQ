@@ -287,7 +287,7 @@ Si on fait précéder le nom d'un `-`, la colonne est éliminée plutôt que sé
 
 ```{r}
 # Sélectionner toutes les colonnes sauf le sexe et l'âge
-select(airports, -sexe, -age)
+select(rp, -sexe, -age)
 ```
 
 ## Créer une colonne et recoder sous conditions
@@ -436,7 +436,9 @@ Finalement, la fonction `irec` permet de réaliser le recodage d'une variable ca
 
 # Recodage interactif de la variable sexe
 irec(rp$sexe)
+```
 
+```{r}
 ## Recoding rp$sexe into rp$sexe_rec
 rp$sexe_rec <- rp$sexe %>%
   as.character() %>%
@@ -445,6 +447,7 @@ rp$sexe_rec <- rp$sexe %>%
     "Femmes" = "2"
   )
 ```
+
 
 ## Exercices
 
@@ -894,7 +897,7 @@ RColorBrewer::display.brewer.all()
 ggplot(rp) +
   geom_bar(aes(x = arrondissements,
                fill = sexe,
-               weights = ipondi),
+               weight = ipondi),
            position = "dodge") +
   labs(
     title = "Population par arrondissement selon le genre",
@@ -911,11 +914,10 @@ couleurs_sexe <-
     "Femme" = "#d7191c")
 
 # Puis avec la version manual de la fonction scale
-# Automatiquement, en choissisant la Palette "Set1"
 ggplot(rp) +
   geom_bar(aes(x = arrondissements,
                fill = sexe,
-               weights = ipondi),
+               weight = ipondi),
            position = "dodge") +
   labs(
     title = "Population par arrondissement selon le genre",
@@ -926,6 +928,28 @@ ggplot(rp) +
   scale_fill_manual("Sexe",
                     values = couleurs_sexe)
 
+```
+
+### `theme` et `theme_`
+Les fonctions `theme` et `theme_` permettent de choisir des modèles graphiques et paramètrer des éléments.
+
+```{r}
+# Passer en thème blanc et noir et mettre la légende en bas
+ggplot(rp) +
+  geom_bar(aes(x = arrondissements,
+               fill = sexe,
+               weight = ipondi),
+           position = "dodge") +
+  labs(
+    title = "Population par arrondissement selon le genre",
+    y = "Nombre d'habitant·es",
+    x = "Arrondissement",
+    caption = "Source : recensement de la population 2017 (INSEE) | A. POISSONNIER | 2024"
+  ) +
+  scale_fill_manual("Sexe",
+                    values = couleurs_sexe) +
+  theme_bw() +
+  theme(legend.position = "bottom")
 ```
 
 
