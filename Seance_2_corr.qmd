@@ -845,6 +845,7 @@ Il reste à légender correctement notre graphique et potentiellement transforme
 La fonction `labs` permet de spécifier en un coup la quasi-totalité des légendes d'un graphique.
 
 ```{r}
+# Légender
 ggplot(rp) +
   geom_bar(aes(x = arrondissements,
                fill = sexe,
@@ -864,6 +865,7 @@ Les fonctions `scale_` permettent finalement de transformer les axes et leurs é
 - La nature de l'échelle (continuous, discrete etc.)
 
 ```{r}
+# Légender et changer le nom de la légende des couleurs
 ggplot(rp) +
   geom_bar(aes(x = arrondissements,
                fill = sexe,
@@ -876,6 +878,54 @@ ggplot(rp) +
     caption = "Source : recensement de la population 2017 (INSEE) | A. POISSONNIER | 2024"
   ) +
   scale_fill_discrete("Sexe")
+```
+
+Elles permet par ailleurs de changer la couleur, automatiquement en changeant de palette ou manuellement en spécifiant des valeurs. On peut notamment se référer aux couleurs du package `RColorBrewer`. Il faut alors utiliser les fonctions `scale_color_brewer` et `scale_fill_brewer`.
+
+```{r}
+# Afficher toutes les palettes de couleur
+# On appelle ici la fonction sans avoir préalablement hargé le package avec library, d'où le RColorBrewer::
+RColorBrewer::display.brewer.all()
+```
+
+
+```{r}
+# Automatiquement, en choissisant la Palette "Set1"
+ggplot(rp) +
+  geom_bar(aes(x = arrondissements,
+               fill = sexe,
+               weights = ipondi),
+           position = "dodge") +
+  labs(
+    title = "Population par arrondissement selon le genre",
+    y = "Nombre d'habitant·es",
+    x = "Arrondissement",
+    caption = "Source : recensement de la population 2017 (INSEE) | A. POISSONNIER | 2024"
+  ) +
+  scale_fill_brewer("Sexe",
+                    palette = "Set1")
+
+# Manuellement en créant un vecteur nommé
+couleurs_sexe <- 
+  c("Homme" = "#ffffbf",
+    "Femme" = "#d7191c")
+
+# Puis avec la version manual de la fonction scale
+# Automatiquement, en choissisant la Palette "Set1"
+ggplot(rp) +
+  geom_bar(aes(x = arrondissements,
+               fill = sexe,
+               weights = ipondi),
+           position = "dodge") +
+  labs(
+    title = "Population par arrondissement selon le genre",
+    y = "Nombre d'habitant·es",
+    x = "Arrondissement",
+    caption = "Source : recensement de la population 2017 (INSEE) | A. POISSONNIER | 2024"
+  ) +
+  scale_fill_manual("Sexe",
+                    values = couleurs_sexe)
+
 ```
 
 
