@@ -815,20 +815,68 @@ Les paramètres `size` et `alpha` pour la taille et la transparence peuvent vous
 
 ### La position
 
-L'argument `position` permet de spécifier la disposition des barres. Elle permet de mener des comparaison inter et intragroupes par comparaison de hauteur. `= dodge` permet de mettre les barres côte à côte, `= stack` de les empiler (valeur par défaut) et `= fill` de calculer les parts.
+L'argument `position` permet de spécifier la disposition des barres. Elle permet de mener des comparaison inter et intragroupes par comparaison de hauteur. `= dodge` permet de mettre les barres côte à côte, `= stack` de les empiler (valeur par défaut) et `= fill` de representer les parts.
+
+```{r}
+# Dodge
+ggplot(rp) +
+  geom_bar(aes(x = arrondissements,
+               fill = sexe),
+           position = "dodge")
+
+# Stack
+ggplot(rp) +
+  geom_bar(aes(x = arrondissements,
+               fill = sexe),
+           position = "stack")
+
+# Fill
+ggplot(rp) +
+  geom_bar(aes(x = arrondissements,
+               fill = sexe),
+           position = "fill")
+```
+
+
+## Modifier les légendes et les axes
+Il reste à légender correctement notre graphique et potentiellement transformer ses axes.
+
+### `labs`
+La fonction `labs` permet de spécifier en un coup la quasi-totalité des légendes d'un graphique.
 
 ```{r}
 ggplot(rp) +
   geom_bar(aes(x = arrondissements,
-               color = sexe),
-           position = "dodge")
-
-ggplot(rp) +
-  geom_bar(aes(x = arrondissements,
-               color = sexe),
-           position = "stack")
+               fill = sexe,
+               weights = ipondi),
+           position = "dodge") +
+  labs(
+    title = "Population par arrondissement selon le genre",
+    y = "Nombre d'habitant·es",
+    x = "Arrondissement",
+    caption = "Source : recensement de la population 2017 (INSEE) | A. POISSONNIER | 2024"
+  )
 ```
 
+### `scale_`
+Les fonctions `scale_` permettent finalement de transformer les axes et leurs étiquettes. Elles s'écrivent :
+- En spécifiant la dimension ciblée (axes x et y, fill, color, alpha etc.)
+- La nature de l'échelle (continuous, discrete etc.)
+
+```{r}
+ggplot(rp) +
+  geom_bar(aes(x = arrondissements,
+               fill = sexe,
+               weights = ipondi),
+           position = "dodge") +
+  labs(
+    title = "Population par arrondissement selon le genre",
+    y = "Nombre d'habitant·es",
+    x = "Arrondissement",
+    caption = "Source : recensement de la population 2017 (INSEE) | A. POISSONNIER | 2024"
+  ) +
+  scale_fill_discrete("Sexe")
+```
 
 
 ### Les variables catégorielles à plus de deux modalités
