@@ -483,39 +483,55 @@ rp <-
   )
 ```
 
-# La visualisation de données avec ggplot2 - La logique additive
+
+## Calculer des indicateurs dans des sous-groupes
+
+Les opérations de comparaison d'indicateurs impliquent qu'il faille répéter le même calcul au sein de sous-groupes distincts. Deux fonctions permettront d'aboutir à un tel résultat.
+
+## Summarize et .by
+
+La fonction `summarize` permet d'obtenir un tableau synthétique qui recense le résultat d'opérations de calcul. Elle s'utilise avec l'argument `.by` qui définit dans quelles sous-populations le logiciel doit travailler : chez les hommes puis chez les femmes (distinguées par la variable `sexe`), par arrondissements (distingués par la variable `arm`) etc.
 
 ```{r}
-hdv2003 <- 
-  hdv2003 |>
-  mutate(
-    cat_age =
-      fct(
-        case_when(
-          age < 30 ~ "Moins de 30 ans",
-          age %in% 30:44 ~ "30 à 44 ans",
-          age %in% 45:64 ~ "45 à 64 ans",
-          age > 64 ~ "65 ans et plus"
-        ),
-        levels =
-          c("Moins de 30 ans",
-            "30 à 44 ans",
-            "45 à 64 ans",
-            "65 ans et plus")
-      ),
-    occup = fct(
-      case_when(
-        occup == "Retire des affaires" ~ "Retraite",
-        occup == "Au foyer" ~ "Autre inactif",
-        occup == "Chomeur" ~ "Actif",
-        occup == "Exerce une profession" ~ "Actif",
-        occup == "Etudiant, eleve" ~ "Étudiant",
-        TRUE ~ occup)
-    )
-  )
+# La moyenne d'âge des lyonnais·es
+mean(rp$agerev)
+
+# La fonction summarize sans groupes spécifiés par .by
+summarize(rp, 
+          age_m = mean(agerev))
+# On obtient 1 seule ligne : la moyenne d'âge des lyonnais·es
+
+# La fonction summarize avec groupes spécifiés par .by
+summarize(rp, 
+          age_m = mean(agerev),
+          .by = sexe)
+# On obtient 2 lignes : l'âge moyen des femmes et des hommes
 ```
 
-### La logique additive - Les variable catégorielles
+L'argument `.by` peut aussi être un argument de la fonction `mutate`. On peut par exemple vouloir créer une colonne qui ajoute une variable à chaque individu renseignant la valeur prise par le sous-groupes. Par exemple, l'âge moyen dans le groupe définit par le sexe, pour ensuite faire l'écart entre l'âge de l'individu et l'âge moyen des personnes de même sexe.
+
+```{r}
+# Créer une colonne qui renseigne l'âge moyen dans le sous-groupe de sexe
+rp <- 
+  mutate(
+    rp,
+    age_m = mean(agerev),
+    .by = sexe)
+
+# Vérifier le résultat
+rp$age_m
+
+
+# Calculer la différence entre l'âge individuel et l'âge moyen dans le sous-groupe de sexe
+```
+
+
+
+
+
+# La visualisation de données avec ggplot2 
+
+## La logique additive de ggplot2
 
 Le package `ggplot2` permet de faire l'essentiel de la représentation graphique des données. Il fonctionne selon une logique additive de couches additionnées par l'opérateur `+`
 
@@ -523,14 +539,22 @@ Le package `ggplot2` permet de faire l'essentiel de la représentation graphique
 
 -   Les fonctions de la forme `geom_` permettent de produire des graphiques. On indique les variables à utiliser à l'intérieur de la fonction `aes()`.
 
--   D'autres fonctions permettent de paramétrer le graphique, ajouter des légendes et d'autres modifications.
+    -   Tout ce qui est indiqué à l'intérieur `aes()` implique qu'on fait un lien avec les données : compter les effectifs, calculer des moyennes, colorier selon la catégoriew etc.
+
+    -   Tout ce qui est indiqué à l'extérieur d'`aes()` correspond à des paramètres indépendants des données : colorier toutes les barres en bleu, rendre semi-transparents les points du nuage de points
+
+-   Des fonctions supplémentaires permettent finalement de paramétrer le graphique, ajouter des légendes et d'autres modifications.
+
+## Une fonction par représentation
+
+### Les diagrammes en barre
+
+Les diagrammes en barres sont obtenus par le fonction `geom_bar`. Un graphique produit par `ggplot2` s'écrira donc sous cette forme :
 
 ```{r}
 # Créons un diagramme en bâtons de la population des arrondissements lyonnais
 ggplot(rp) +
-  geom_bar(aes(x = ))
-
-rp$arm
+  geom_bar(aes(x = arm))
 ```
 
 ### Cohérence entre les données, le type de graphique et le code
@@ -539,24 +563,25 @@ Le graphique ci-dessus est un exemple très commun des problèmes qui émergent 
 
 ```{r}
 # Dans la version précédente de ce code, la variable non recodée des arrondissements était utilisée
-class(rp19$ARM)
+class(rp$arm)
+
 # Les arrondissements sont considérés comme des valeurs numériques.
 # Il faut les convertir en facteurs. Profitons-en pour recoder.
-rp19 <-
-  rp19 %>%
+rp <-
+  rp %>%
   mutate(
     arrondissements =
       fct(
         case_when(
-          ARM == 69381 ~ "1er",
-          ARM == 69382 ~ "2nd",
-          ARM == 69383 ~ "3e",
-          ARM == 69384 ~ "4e",
-          ARM == 69385 ~ "5e",
-          ARM == 69386 ~ "6e",
-          ARM == 69387 ~ "7e",
-          ARM == 69388 ~ "8e",
-          ARM == 69389 ~ "9e"
+          arm == 69381 ~ "1er",
+          arm == 69382 ~ "2nd",
+          arm == 69383 ~ "3e",
+          arm == 69384 ~ "4e",
+          arm == 69385 ~ "5e",
+          arm == 69386 ~ "6e",
+          arm == 69387 ~ "7e",
+          arm == 69388 ~ "8e",
+          arm == 69389 ~ "9e"
         ),
         levels = c("1er",
                    "2nd",
@@ -571,54 +596,122 @@ rp19 <-
   )
 
 # On vérifie notre recodage
-levels(rp19$arrondissements)
+levels(rp$arrondissements)
 
 # Le graphique actualisé
-ggplot(rp19) +
+ggplot(rp) +
   geom_bar(aes(x = arrondissements))
-```
-
-Sachant que la fonction pour représenter des histogrammes (pour les variables quantitatives) est `geom_histogram` et que la variable de l'âge des individus rencensés est `AGEREV`, vérifiez que la variable d'âge est de la bonne classe d'objet et construisez un histogramme qui représente la distribution des âges.
-
-```{r}
-class(rp19$AGEREV)
-ggplot(rp19) +
-  geom_histogram(aes(x = AGEREV))
 ```
 
 ### Distinguer les paramètres liés aux variables et les paramètres indépendants
 
 Il faut bien distinguer deux types de commandes données aux fonctions `geom_`. Celles à l'intérieur de `aes` vont interroger les données pour produire quelque chose : compter les effectifs des modalités d'une variable, différencier la coulour ou la forme des points selon les modalités d'une variable etc. Les arguments à l'extérieur de `aes` s'appliquent uniformément à tous les éléments du graphique.
 
-Avant de le montrer en graphique, recodez la variable `SEXE` en facteur. La valeur 1 correspond aux hommes et 2 aux femmes. Faites en sorte que la modalité "Femme" soit la première modalité du nouveau facteur plutôt que l'inverse.
+### Exercices
+
+1. Recodez la variable `sexe` en facteur. La valeur 1 correspond aux hommes et 2 aux femmes. Faites en sorte que la modalité "Femme" soit la première modalité du nouveau facteur plutôt que l'inverse.
+2. Construisez un diagramme en barre de la population par arrondissement (variable `arrondissements`)
+3. Ajoutez l'argument `fill = "red"` dans la fonction `geom_` en dehors d'`aes()`
+4. Ajoutez l'argument `fill = sexe` dans la fonction `geom` à l'intérieur d'`aes()`
+
 
 ```{r}
-rp19 <-
-  rp19 %>%
+# 1
+rp <-
+  rp %>%
   mutate(
-    SEXE = 
+    sexe = 
       fct(
-        ifelse(SEXE == 1, "Homme", "Femme"),
+        ifelse(sexe == 1, "Homme", "Femme"),
         levels = c("Femme", "Homme"))
   )
 ```
 
 ```{r}
-ggplot(rp19) +
+# 2
+ggplot(rp) +
+  geom_bar(aes(x = arrondissements))
+
+# 3
+ggplot(rp) +
   geom_bar(aes(x = arrondissements),
            fill = "red")
-ggplot(rp19) +
+# 4
+ggplot(rp) +
   geom_bar(aes(x = arrondissements,
-               fill = SEXE))
-ggplot(rp19) +
-  geom_bar(aes(x = arrondissements,
-               fill = SEXE,
-               weight = IPONDI))
+               fill = sexe))
+```
 
-ggplot(rp19) +
+
+
+### La pondération
+
+L'argument `weight` permet de préciser la pondération à utiliser. Puisque la pondération intervient dans les calculs opérés par `ggplot`, on l'ajoute à l'intérieur d'`aes()` .
+
+Il ne faut pas se soucier du message :
+
+```         
+The following aesthetics were dropped during statistical transformation: weights.
+```
+
+```{r}
+# Diagramme en barres pondérées
+ggplot(rp) +
   geom_bar(aes(x = arrondissements,
-               fill = IMMI,
-               weight = IPONDI))
+               weight = ipondi))
+```
+
+
+
+
+## Exercices - Les histogrammes
+
+1.  Sachant que la fonction pour représenter des histogrammes (pour les variables quantitatives) est `geom_histogram` et que la variable de l'âge des individus rencensés est `agerev`, vérifiez que la variable d'âge est de la bonne classe d'objet et construisez un histogramme qui représente la distribution des âges.
+2.  Ajoutez l'argument `bins = 10` dans la fonction `geom_histogram` et observez le résultat
+3.  Ajoutez l'argument `binwidth = 1` dans la fonction `geom_histogram` et observez le résultat
+
+```{r}
+# 1
+# On vérifie la nature de la colonne
+class(rp$agerev)
+
+# On construit un histogramme
+ggplot(rp) +
+  geom_histogram(aes(x = agerev))
+
+
+# 2
+ggplot(rp) +
+  geom_histogram(aes(x = agerev),
+                 bins = 10)
+
+# 3
+ggplot(rp) +
+  geom_histogram(aes(x = agerev),
+                 binwidth = 1)
+```
+
+
+### La boîte à moustaches
+
+La fonction `geom_boxplot` permet de construire des boîtes à moustaches. L'argument `x` détermine la variable numérique dont on veut connaître la distribution. L'argument `y`, optionnel, permet de comparer les distributions selon le sous-groupe défini par une variable catégorielle. 
+
+```{r}
+# La distribution des âges selon l'arrondissement lyonnais
+ggplot(rp) +
+  geom_boxplot(
+    aes(x = agerev,
+        y = arrondissements)
+  )
+```
+
+### Le nuage de points
+
+La fonction `geom_point` peremt de construire des nuages de point. L'argument `x` détermine la variable représentée sur l'axe des abscisses et l'argument `y` celle sur l'axe des ordonnées. 
+
+
+```{r}
+
 ```
 
 ### Les variables catégorielles à plus de deux modalités
