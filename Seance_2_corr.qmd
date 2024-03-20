@@ -488,7 +488,7 @@ rp <-
 
 Les opérations de comparaison d'indicateurs impliquent qu'il faille répéter le même calcul au sein de sous-groupes distincts. Deux fonctions permettront d'aboutir à un tel résultat.
 
-## Summarize et .by
+### Summarize et .by
 
 La fonction `summarize` permet d'obtenir un tableau synthétique qui recense le résultat d'opérations de calcul. Elle s'utilise avec l'argument `.by` qui définit dans quelles sous-populations le logiciel doit travailler : chez les hommes puis chez les femmes (distinguées par la variable `sexe`), par arrondissements (distingués par la variable `arm`) etc.
 
@@ -523,17 +523,61 @@ rp$age_m
 
 
 # Calculer la différence entre l'âge individuel et l'âge moyen dans le sous-groupe de sexe
+rp <- 
+  mutate(
+    rp,
+    dif_age_m = agerev - age_m)
+
+# Vérifier le résultat
+rp$dif_age_m
 ```
 
 
+## Exercices
+1. Calculez l'âge moyen des immigré·es et des non-immigré·es
+2. Calculez l'âge moyen des immigré·es et des non-immigré·es selon le sexe
+3. Créez une colonne `age_immisexe` de l'âge moyen selon le statut d'immigration
+4. Créez une colonne qui fais la différence entre l'âge individuel et l'âge moyen `age_immisexe`
 
+
+```{r}
+# 1
+summarize(
+  rp,
+  age_m = mean(agerev),
+  .by = immi
+)
+
+# 2
+summarize(
+  rp,
+  age_m = mean(agerev),
+  .by = c(immi, sexe)
+)
+
+# 3
+rp <-
+  mutate(
+    rp,
+    age_m = mean(agerev),
+    .by = c(immi, sexe)
+  )
+
+
+# 4
+rp <-
+  mutate(
+    rp,
+    diff_age_m = agerev - age_m,
+  )
+```
 
 
 # La visualisation de données avec ggplot2 
 
 ## La logique additive de ggplot2
 
-Le package `ggplot2` permet de faire l'essentiel de la représentation graphique des données. Il fonctionne selon une logique additive de couches additionnées par l'opérateur `+`
+Le package `ggplot2` permet de faire l'essentiel de la représentation graphique des données. Il fonctionne selon une logique additive : on ajoute des couches par l'opérateur `+`
 
 -   La fonction `ggplot` permet de déclarer les données sur lesquelles on va travailler.
 
@@ -663,7 +707,6 @@ ggplot(rp) +
 
 
 
-
 ## Exercices - Les histogrammes
 
 1.  Sachant que la fonction pour représenter des histogrammes (pour les variables quantitatives) est `geom_histogram` et que la variable de l'âge des individus rencensés est `agerev`, vérifiez que la variable d'âge est de la bonne classe d'objet et construisez un histogramme qui représente la distribution des âges.
@@ -707,11 +750,17 @@ ggplot(rp) +
 
 ### Le nuage de points
 
-La fonction `geom_point` peremt de construire des nuages de point. L'argument `x` détermine la variable représentée sur l'axe des abscisses et l'argument `y` celle sur l'axe des ordonnées. 
+La fonction `geom_point` peremt de construire des nuages de point. L'argument `x` détermine la variable représentée sur l'axe des abscisses et l'argument `y` celle sur l'axe des ordonnées. Ici, on opère d'abord un calcul d'indicateur par arrondissement : l'âge moyen et le nombre d'habitant·es.
 
 
 ```{r}
-
+# Construire un tableau qui recense l'âge moyen et le nombre d'habitant·es
+tab_arr <-
+  summarize(rp,
+            age_m = mean(agerev),
+            # Ici, on fait la somme des poids mais on aurait écrit n() pour compter les effectifs non on'derés
+            pop = sum(ipondi),
+            .by = arrondissement) 
 ```
 
 ### Les variables catégorielles à plus de deux modalités
