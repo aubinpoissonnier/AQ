@@ -11,15 +11,23 @@ editor_options:
 
 library(questionr)
 library(tidyverse)
+
+download.file("https://vico.hypotheses.org/files/2021/03/vico2020.csv",
+              "vico.csv")
+vico <- read_csv2("vico.csv")
+
+
+data("hdv2003")
+
 rp <- aws.s3::s3read_using(FUN = data.table::fread,
-                           object = "/diffusion/RP/rp69_2017.csv",
+                           object = "/diffusion/RP/rplyon_2017.csv",
                            bucket = "aubinpoissonnier",
                            opts = list("region" = ""))
 ```
 
 # Compter avec des variables catégorielles
 
-Vous travaillez ici avec les données du recensement anonymisées, publiées sous forme d'un fichier comportant une ligne par individu. La base `rp` correspond au recensement de 2017 pour le département du rhône. Le dictionnaire des codes est disponible à [cette adresse](https://www.insee.fr/fr/statistiques/4802064?sommaire=4508161#dictionnaire).
+Vous travaillez ici avec les données du recensement anonymisées, publiées sous forme d'un fichier comportant une ligne par individu. La base `rp` correspond au recensement de 2017 pour la ville de Lyon. Le dictionnaire des codes est disponible à [cette adresse](https://www.insee.fr/fr/statistiques/4802064?sommaire=4508161#dictionnaire).
 
 ## Tri à plat et tri croisé
 
@@ -91,16 +99,37 @@ tab_sexe_couple
 Pour les tableaux croisés, les fonctions `lprop` et `cprop` du package `questionr` permettent d'obtenir très facilement les pourcentages en ligne ou en colonne ainsi que les marges.
 
 ```{r}
-library(questionr)
-
 rprop(tab_sexe_couple)
 cprop(tab_sexe_couple)
 ```
 
 ## Exercices
 
-```{r}
+1.  Déterminez la part de la population qui est étudiante (= lyonnais·es qui sont inscrit·es dans un établissement d'enseignement supérieur)
 
+```{r}
+# On calcul les effectifs avec un tri à plat
+tab_etud <- wtd.table(rp$etud, weights = rp$ipondi)
+# Puis la proportion
+proportions(tab_etud)
+```
+
+2.  Déterminez pour les hommes et pour les femmes la part d'étudiant·es
+
+```{r}
+# On calcul les effectifs avec un tri croisé
+tab_etud <- wtd.table(rp$sexe, rp$etud, weights = rp$ipondi)
+# Puis la proportion
+rprop(tab_etud)
+```
+
+3.  Déterminez la part de femmes et d'hommes chez les étudiant·es et chez les non étudiant·es
+
+```{r}
+# On calcul les effectifs avec un tri croisé en inversant les variables
+tab_etud <- wtd.table(rp$etud, rp$sexe, weights = rp$ipondi)
+# Puis la proportion
+rprop(tab_etud)
 ```
 
 # Le recodage sur R
@@ -184,6 +213,47 @@ Enfin, on peut inverser un test avec l'opérateur *non* (`!`) :
 
 ```{r}
 !(vec %in% c("Jaune", "Vert"))
+```
+
+## Exercices
+
+Appliquez un test sur les habitant·es de Lyon qui vérifie si ils et elles sont :
+
+1.  Immigré·es
+2.  Immigré·es et majeur·es
+3.  Immgré·es marié·es ou pacsé·es
+4.  Immigré·es français·es marié·es ou pacsé
+5.  Immigré·es français marié·es ou immigré·es étranger·es pacsé·es
+6.  Immigré·es pas propriétaires
+
+```{r}
+# 1
+rp$immi == 1
+
+# 2
+rp$immi == 1 & 
+  rp$agerev > 17
+
+# 3 
+rp$immi == 1 &
+  rp$stat_conj %in% 1:2
+
+# 4
+rp$immi == 1 &
+  rp$stat_conj %in% 1:2 &
+  rp$inatc == 1
+
+# 5
+(rp$immi == 1 &
+  rp$stat_conj == 1 &
+    rp$inatc == 1) |
+  (rp$immi == 1 &
+  rp$stat_conj == 2 &
+  rp$inatc == 2)
+
+# 6
+rp$immi ==1 &
+  rp$stocd != 10
 ```
 
 ## Le recodage sous condition
@@ -294,4 +364,441 @@ cat_age <-
       )
 # Le problème est résolu
 table(cat_age)
+```
+
+```{r}
+ggplot(vico) +
+  geom_point(
+    aes(x = RESNB,
+        y = AGE)
+  )
+```
+
+```{r}
+names(vico)
+```
+
+```{r}
+ggplot(vico) +
+  geom_bar(aes(x = POL,
+               weights = POIDS_init))
+```
+
+# La visualisation de données avec ggplot2 - La logique additive
+
+```{r}
+hdv2003 <- 
+  hdv2003 |>
+  mutate(
+    cat_age =
+      fct(
+        case_when(
+          age < 30 ~ "Moins de 30 ans",
+          age %in% 30:44 ~ "30 à 44 ans",
+          age %in% 45:64 ~ "45 à 64 ans",
+          age > 64 ~ "65 ans et plus"
+        ),
+        levels =
+          c("Moins de 30 ans",
+            "30 à 44 ans",
+            "45 à 64 ans",
+            "65 ans et plus")
+      ),
+    occup = fct(
+      case_when(
+        occup == "Retire des affaires" ~ "Retraite",
+        occup == "Au foyer" ~ "Autre inactif",
+        occup == "Chomeur" ~ "Actif",
+        occup == "Exerce une profession" ~ "Actif",
+        occup == "Etudiant, eleve" ~ "Étudiant",
+        TRUE ~ occup)
+    )
+  )
+```
+
+### La logique additive - Les variable catégorielles
+
+Le package `ggplot2` permet de faire l'essentiel de la représentation graphique des données. Il fonctionne selon une logique additive de couches additionnées par l'opérateur `+`
+
+-   La fonction `ggplot` permet de déclarer les données sur lesquelles on va travailler.
+
+-   Les fonctions de la forme `geom_` permettent de produire des graphiques. On indique les variables à utiliser à l'intérieur de la fonction `aes()`.
+
+-   D'autres fonctions permettent de paramétrer le graphique, ajouter des légendes et d'autres modifications.
+
+```{r}
+# Créons un diagramme en bâtons de la population des arrondissements lyonnais
+ggplot(rp) +
+  geom_bar(aes(x = ))
+
+rp$arm
+```
+
+### Cohérence entre les données, le type de graphique et le code
+
+Le graphique ci-dessus est un exemple très commun des problèmes qui émergent quand on ne s'assure pas de la cohérence entre les données dont on dispose, le type de graphique qu'on construit et le code qu'on écrit. Il faut toujours régler les problèmes au fur et à mesure, c'est la seule façon d'isoler les problèmes et de les régler efficacement.
+
+```{r}
+# Dans la version précédente de ce code, la variable non recodée des arrondissements était utilisée
+class(rp19$ARM)
+# Les arrondissements sont considérés comme des valeurs numériques.
+# Il faut les convertir en facteurs. Profitons-en pour recoder.
+rp19 <-
+  rp19 %>%
+  mutate(
+    arrondissements =
+      fct(
+        case_when(
+          ARM == 69381 ~ "1er",
+          ARM == 69382 ~ "2nd",
+          ARM == 69383 ~ "3e",
+          ARM == 69384 ~ "4e",
+          ARM == 69385 ~ "5e",
+          ARM == 69386 ~ "6e",
+          ARM == 69387 ~ "7e",
+          ARM == 69388 ~ "8e",
+          ARM == 69389 ~ "9e"
+        ),
+        levels = c("1er",
+                   "2nd",
+                   "3e",
+                   "4e",
+                   "5e",
+                   "6e",
+                   "7e",
+                   "8e",
+                   "9e")
+        )
+  )
+
+# On vérifie notre recodage
+levels(rp19$arrondissements)
+
+# Le graphique actualisé
+ggplot(rp19) +
+  geom_bar(aes(x = arrondissements))
+```
+
+Sachant que la fonction pour représenter des histogrammes (pour les variables quantitatives) est `geom_histogram` et que la variable de l'âge des individus rencensés est `AGEREV`, vérifiez que la variable d'âge est de la bonne classe d'objet et construisez un histogramme qui représente la distribution des âges.
+
+```{r}
+class(rp19$AGEREV)
+ggplot(rp19) +
+  geom_histogram(aes(x = AGEREV))
+```
+
+### Distinguer les paramètres liés aux variables et les paramètres indépendants
+
+Il faut bien distinguer deux types de commandes données aux fonctions `geom_`. Celles à l'intérieur de `aes` vont interroger les données pour produire quelque chose : compter les effectifs des modalités d'une variable, différencier la coulour ou la forme des points selon les modalités d'une variable etc. Les arguments à l'extérieur de `aes` s'appliquent uniformément à tous les éléments du graphique.
+
+Avant de le montrer en graphique, recodez la variable `SEXE` en facteur. La valeur 1 correspond aux hommes et 2 aux femmes. Faites en sorte que la modalité "Femme" soit la première modalité du nouveau facteur plutôt que l'inverse.
+
+```{r}
+rp19 <-
+  rp19 %>%
+  mutate(
+    SEXE = 
+      fct(
+        ifelse(SEXE == 1, "Homme", "Femme"),
+        levels = c("Femme", "Homme"))
+  )
+```
+
+```{r}
+ggplot(rp19) +
+  geom_bar(aes(x = arrondissements),
+           fill = "red")
+ggplot(rp19) +
+  geom_bar(aes(x = arrondissements,
+               fill = SEXE))
+ggplot(rp19) +
+  geom_bar(aes(x = arrondissements,
+               fill = SEXE,
+               weight = IPONDI))
+
+ggplot(rp19) +
+  geom_bar(aes(x = arrondissements,
+               fill = IMMI,
+               weight = IPONDI))
+```
+
+### Les variables catégorielles à plus de deux modalités
+
+Représentez la population de chaque arrondissement et sa composition socio-professionnelle en excluant les agriculteur.ices, les retraité.es et les inacti.f.ves.
+
+| Code | Modalité                                          |
+|------|---------------------------------------------------|
+| 1    | Agriculteurs exploitants                          |
+| 2    | Artisans, commerçants et chefs d'entreprise       |
+| 3    | Cadres et professions intellectuelles supérieures |
+| 4    | Professions Intermédiaires                        |
+| 5    | Employés                                          |
+| 6    | Ouvriers                                          |
+| 7    | Retraités                                         |
+| 8    | Inactifs                                          |
+
+: Dictionnaire des codes de la variable CS1
+
+```{r}
+rp19 <-
+  rp19 %>%
+  mutate(
+    csp =
+      fct(
+        case_when(
+          CS1 == 1 ~ "Agriculteurs exploitants",
+          CS1 == 2 ~ "Artisans, commerçants et chefs d'entreprise",
+          CS1 == 3 ~ "Cadres et professions intellectuelles supérieures",
+          CS1 == 4 ~ "Professions intermédiaires",
+          CS1 == 5 ~ "Employés",
+          CS1 == 6 ~ "Ouvriers",
+          CS1 == 7 ~ "Retraités",
+          CS1 == 8 ~ "Inactifs"),
+        levels = c("Agriculteurs exploitants",
+                   "Artisans, commerçants et chefs d'entreprise",
+                   "Cadres et professions intellectuelles supérieures",
+                   "Professions intermédiaires",
+                   "Employés",
+                   "Ouvriers",
+                   "Retraités",
+                   "Inactifs")
+      )
+  )
+
+rp19 %>%
+  filter(!(csp %in% c("Agriculteurs exploitants", 
+                      "Retraités",
+                      "Inactifs"))) %>%
+  ggplot() +
+  geom_bar(aes(x = arrondissements,
+               fill = csp,
+               weight = IPONDI))
+```
+
+### Modifier le texte et les légendes
+
+Il faut ensuite ajouter tous les éléments nécessaires à la bonne lecture d'un graphique. On choisit des couleurs à l'aide du site [ColorBrewer](https://colorbrewer2.org/).
+
+```{r, fig.height=6, fig.width=8}
+# Je créer un vecteur nommé, c'est-à-dire que je donne un nom à chacune des valeurs.
+couleurs_csp <-
+  c("Artisans, commerçants et chefs d'entreprise" = "#ffffbf",
+    "Cadres et professions intellectuelles supérieures" = "#d7191c",
+    "Professions intermédiaires" = "#fdae61",
+    "Employés" = "#abd9e9",
+    "Ouvriers" = "#2c7bb6")
+
+# Je construis mon graphique en filtrant d'abord les données
+graph <- filter(rp19, !(csp %in% c("Agriculteurs exploitants", 
+                      "Retraités",
+                      "Inactifs"))) %>%
+  ggplot() +
+  geom_bar(aes(x = arrondissements,
+               fill = csp,
+               weight = IPONDI))
+
+graph +
+  # Je rajoute les légendes
+  labs( # Fonction qui permet de définir les titres et textes
+    title = "Population et composition socio-professionnelle des arrondissements lyonnais en 2019",
+    x = "Arrondissement",
+    y = "Effectifs",
+    fill = "Catégorie socio-professionnelle",
+    caption = 
+    "Champ : actif.ves sauf agriculteur.ices
+    Lecture : en 2019, il y avait 18 000 habitant.es dans le premier arrondissement de Lyon.
+    La majorité des habitant.es appartiennent à la catégorie des cadres et des professions intellectuelles supérieures
+    Recensement de la population 2019 | A. POISSONNIER | 2023") +
+  # Je change les couleurs et le thème graphique
+  scale_fill_manual(values = couleurs_csp,
+                    labels = scales::label_wrap(30)) + 
+  theme_minimal() +
+  theme(legend.position = "bottom") +
+  guides(fill = guide_legend(nrow = 3,
+                             byrow = T))
+```
+
+# La visualisation de données avec ggplot2 - Choisir la représentation adéquate
+
+### Changer la position des barres superposées
+
+La lisibilité d'un graphique et le risque qu'il amène des erreurs d'interprétation est très différent selon la façon dont on représente l'information.
+
+```{r, fig.height=6, fig.width=8}
+# Je créer un vecteur nommé, c'est-à-dire que je donne un nom à chacune des valeurs.
+couleurs_csp <-
+  c("Artisans, commerçants et chefs d'entreprise" = "#ffffbf",
+    "Cadres et professions intellectuelles supérieures" = "#d7191c",
+    "Professions intermédiaires" = "#fdae61",
+    "Employés" = "#abd9e9",
+    "Ouvriers" = "#2c7bb6")
+
+# Je construis mon graphique en filtrant d'abord les données
+graph <- filter(rp19, !(csp %in% c("Agriculteurs exploitants", 
+                      "Retraités",
+                      "Inactifs"))) %>%
+  ggplot() +
+  geom_bar(aes(x = arrondissements,
+               fill = csp,
+               weight = IPONDI),
+           position = "dodge")
+
+# Je rajoute les légendes
+graph +
+  labs( # Fonction qui permet de définir les titres et textes
+    title = "Population et composition socio-professionnelle des arrondissements lyonnais en 2019",
+    x = "Arrondissement",
+    y = "Effectifs",
+    fill = "Catégorie socio-professionnelle",
+    caption = 
+    "Champ : actif.ves sauf agriculteur.ices
+    Lecture : en 2019, il y avait 18 000 habitant.es dans le premier arrondissement de Lyon.
+    La majorité des habitant.es appartiennent à la catégorie des cadres et des professions intellectuelles supérieures
+    Recensement de la population 2019 | A. POISSONNIER | 2023") +
+  # Je change les couleurs et le thème graphique
+  scale_fill_manual(values = couleurs_csp,
+                    labels = scales::label_wrap(30)) + 
+  theme_minimal() +
+  theme(legend.position = "bottom") +
+  guides(fill = guide_legend(nrow = 3,
+                             byrow = T))
+```
+
+### Représenter des distributions en pourcentages
+
+```{r, fig.height=6, fig.width=8}
+# Je créer un vecteur nommé, c'est-à-dire que je donne un nom à chacune des valeurs.
+couleurs_csp <-
+  c("Artisans, commerçants et chefs d'entreprise" = "#ffffbf",
+    "Cadres et professions intellectuelles supérieures" = "#d7191c",
+    "Professions intermédiaires" = "#fdae61",
+    "Employés" = "#abd9e9",
+    "Ouvriers" = "#2c7bb6")
+
+# Je construis mon graphique en filtrant d'abord les données
+graph <- 
+  rp19 %>%
+  filter(!(csp %in% c("Agriculteurs exploitants", 
+                      "Retraités",
+                      "Inactifs"))) %>%
+  count(arrondissements, csp, wt = IPONDI) %>%
+  group_by(arrondissements) %>%
+  mutate(p = n/sum(n)) %>%
+  ggplot() +
+  geom_bar(aes(x = arrondissements,
+               y = p,
+               fill = csp),
+           position = "dodge",
+           stat = "identity")
+
+# Je rajoute les légendes
+graph +
+  labs( # Fonction qui permet de définir les titres et textes
+    title = "Population et composition socio-professionnelle des arrondissements lyonnais en 2019",
+    x = "Arrondissement",
+    y = "Part (en %)",
+    fill = "Catégorie socio-professionnelle",
+    caption = 
+    "Champ : actif.ves sauf agriculteur.ices
+    Lecture : en 2019, 39% des habitant.es du premier arrondissement de Lyon appartenaient à la catégorie cadres et professions intellectuelles supérieures.
+    Recensement de la population 2019 | A. POISSONNIER | 2023") +
+  # Je change les couleurs et le thème graphique
+  scale_fill_manual(values = couleurs_csp,
+                    labels = scales::label_wrap(30)) + 
+  scale_y_continuous(labels = scales::percent) +
+  theme_minimal() +
+  theme(legend.position = "bottom") +
+  guides(fill = guide_legend(nrow = 3,
+                             byrow = T))
+```
+
+## La visualisation de données avec ggplot2 - les variables numériques
+
+### Les distributions à l'aide des boîtes à moustache
+
+Créez des boîtes à moustache à l'aide de la fonction `geom_boxplot` qui représente la distribution de l'âge en fonction de la variable `IMMI`. N'utilisez pas les poids cette fois-ci.
+
+```{r}
+rp19 %>%
+  ggplot() +
+  geom_boxplot(aes(x = AGEREV,
+                   y = IMMI))
+
+rp19 %>%
+  ggplot() +
+  geom_boxplot(aes(y = AGEREV,
+                   x = IMMI))
+```
+
+### Combiner plusieurs graphiques
+
+On souhaite parfois réaliser la même opération de visualisation mais le représenter dans des graphiques différents. Cela permet de distinguer les niveaux d'analyse à plus de deux dimensions. Il faut pour cela utiliser les fonctions `facet_`
+
+```{r}
+# Reproduire la comparaison des âges à 2 recensements mis côte-à-côte
+rp %>%
+  ggplot() +
+  geom_boxplot(aes(y = AGEREV,
+                   x = IMMI)) +
+  facet_wrap(vars(annee))
+
+# On peut même créer des grilles avec plus d'un croisement
+rp %>%
+  ggplot() +
+  geom_boxplot(aes(y = AGEREV,
+                   x = IMMI)) +
+  facet_grid(vars(SEXE), vars(annee))
+```
+
+### Transformer des données numériques avant de les représenter
+
+Nous avons déjà vu que les verbes de dplyr tel `mutate` changeaient leur fonctionnement si un groupement avait été annoncé avec `group_by`. Les variables `NBPI` et `NPERR` représentent respectivement le nombre de pièces et le nombre de personnes dans le logement habité par la personne recensée. La variable `LPRM` prend la valeur 1 quand la personne recensée est la personne de référence du logement. Créez une nouvelle colonne sur le tableau du recensement de 2019 du nombre de pièces et de personnes moyens par arrondissement. La fonction `weighted.mean` qui prend les arguments `x` pour le vecteur et `w` pour les poids vous permettra de tenir compte de la pondération.
+
+```{r }
+rp19 %>%
+  filter(LPRM == 1) %>%
+  group_by(arrondissements) %>%
+  mutate(moy_NBPI = weighted.mean(x= NBPI, w = IPONDI),
+         moy_NPERR = mean(x = NPERR, w = IPONDI))
+```
+
+### La fonction `summarize`
+
+La fonction `summarize` permet de résumer cette information de groupe en un tableau synthétique.
+
+```{r}
+rp19 %>%
+  filter(LPRM == 1) %>%
+  group_by(arrondissements) %>%
+  summarize(moy_NBPI = weighted.mean(x= NBPI, w = IPONDI),
+         moy_NPERR = weighted.mean(x = NPERR, w = IPONDI))
+```
+
+Représentez graphiquement cette information à l'aide de la fonction `geom_point` qui crée un nuage de points.
+
+```{r}
+rp19 %>%
+  filter(LPRM == "1") %>% # La personne de référence du ménage
+  group_by(arrondissements) %>%
+  summarize(moy_NBPI = weighted.mean(x = NBPI, w = IPONDI),
+            moy_NPERR = weighted.mean(x = NPERR, w = IPONDI)) %>%
+  ggplot() + 
+  geom_point(
+    aes(x = moy_NBPI,
+        y = moy_NPERR))
+```
+
+Associez les points dans le plan en deux dimensions au nom des arrondissements en remplaçant `geom_point` par `geom_text`.
+
+```{r}
+rp19 %>%
+  filter(LPRM == "1") %>% # La personne de référence du ménage
+  group_by(arrondissements) %>%
+  summarize(moy_NBPI = weighted.mean(x = NBPI, w = IPONDI),
+            moy_NPERR = weighted.mean(x = NPERR, w = IPONDI)) %>%
+  ggplot() +
+  geom_text(
+    aes(x = moy_NBPI,
+        y = moy_NPERR,
+        label = arrondissements))
 ```
