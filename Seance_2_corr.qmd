@@ -757,11 +757,79 @@ La fonction `geom_point` peremt de construire des nuages de point. L'argument `x
 # Construire un tableau qui recense l'âge moyen et le nombre d'habitant·es
 tab_arr <-
   summarize(rp,
-            age_m = mean(agerev),
+            age_m = wtd.mean(agerev, weights = ipondi),
             # Ici, on fait la somme des poids mais on aurait écrit n() pour compter les effectifs non on'derés
             pop = sum(ipondi),
-            .by = arrondissement) 
+            .by = arrondissements) 
+
+# On vérifie le tableau
+tab_arr
+
+# Construire le graphique
+ggplot(tab_arr) +
+  geom_point(
+    aes(x = age_m, 
+        y = pop)
+    )
 ```
+
+### Le nuage d'étiquettes ou de texte
+Le graphique précédent ne permet pas d'identifier quel point correspond à quel arrondissement. Il faut pour cela utiliser les fonctions `geom_text` et `geom_label`, avec un nouvel argument : `label = ... ` 
+
+```{r}
+# Nuage de texte
+ggplot(tab_arr) +
+  geom_text(
+    aes(x = age_m, 
+        y = pop,
+        label = arrondissements)
+    )
+
+# Nuage d'étiquettes
+ggplot(tab_arr) +
+  geom_label(
+    aes(x = age_m, 
+        y = pop,
+        label = arrondissements)
+    )
+```
+
+## Des paramètres pour croiser les variables
+### `fill` et `color`
+Il est possible de lier les paramètres des éléments du graphique (taille, couleur, opacité) à la valeur d'une varialbe. C'est ce qui permet de croiser visuellement des variables. 
+Les arguments `fill` et `color` permettent par exemple de colorier les contours ou l'intérieur selon la catégorie.
+
+```{r}
+# L'intérieur colorié
+ggplot(rp) +
+  geom_bar(aes(x = arrondissements,
+               fill = sexe))
+
+# Les contours coloriés
+ggplot(rp) +
+  geom_bar(aes(x = arrondissements,
+               color = sexe))
+```
+
+Les paramètres `size` et `alpha` pour la taille et la transparence peuvent vous être utiles pour des représentations comme les nuages de points. Ils ne sont pas présentés plus en détail ici. 
+
+### La position
+
+L'argument `position` permet de spécifier la disposition des barres. Elle permet de mener des comparaison inter et intragroupes par comparaison de hauteur. `= dodge` permet de mettre les barres côte à côte, `= stack` de les empiler (valeur par défaut) et `= fill` de calculer les parts.
+
+```{r}
+ggplot(rp) +
+  geom_bar(aes(x = arrondissements,
+               color = sexe),
+           position = "dodge")
+
+ggplot(rp) +
+  geom_bar(aes(x = arrondissements,
+               color = sexe),
+           position = "stack")
+```
+
+
 
 ### Les variables catégorielles à plus de deux modalités
 
@@ -953,93 +1021,4 @@ graph +
                              byrow = T))
 ```
 
-## La visualisation de données avec ggplot2 - les variables numériques
 
-### Les distributions à l'aide des boîtes à moustache
-
-Créez des boîtes à moustache à l'aide de la fonction `geom_boxplot` qui représente la distribution de l'âge en fonction de la variable `IMMI`. N'utilisez pas les poids cette fois-ci.
-
-```{r}
-rp19 %>%
-  ggplot() +
-  geom_boxplot(aes(x = AGEREV,
-                   y = IMMI))
-
-rp19 %>%
-  ggplot() +
-  geom_boxplot(aes(y = AGEREV,
-                   x = IMMI))
-```
-
-### Combiner plusieurs graphiques
-
-On souhaite parfois réaliser la même opération de visualisation mais le représenter dans des graphiques différents. Cela permet de distinguer les niveaux d'analyse à plus de deux dimensions. Il faut pour cela utiliser les fonctions `facet_`
-
-```{r}
-# Reproduire la comparaison des âges à 2 recensements mis côte-à-côte
-rp %>%
-  ggplot() +
-  geom_boxplot(aes(y = AGEREV,
-                   x = IMMI)) +
-  facet_wrap(vars(annee))
-
-# On peut même créer des grilles avec plus d'un croisement
-rp %>%
-  ggplot() +
-  geom_boxplot(aes(y = AGEREV,
-                   x = IMMI)) +
-  facet_grid(vars(SEXE), vars(annee))
-```
-
-### Transformer des données numériques avant de les représenter
-
-Nous avons déjà vu que les verbes de dplyr tel `mutate` changeaient leur fonctionnement si un groupement avait été annoncé avec `group_by`. Les variables `NBPI` et `NPERR` représentent respectivement le nombre de pièces et le nombre de personnes dans le logement habité par la personne recensée. La variable `LPRM` prend la valeur 1 quand la personne recensée est la personne de référence du logement. Créez une nouvelle colonne sur le tableau du recensement de 2019 du nombre de pièces et de personnes moyens par arrondissement. La fonction `weighted.mean` qui prend les arguments `x` pour le vecteur et `w` pour les poids vous permettra de tenir compte de la pondération.
-
-```{r }
-rp19 %>%
-  filter(LPRM == 1) %>%
-  group_by(arrondissements) %>%
-  mutate(moy_NBPI = weighted.mean(x= NBPI, w = IPONDI),
-         moy_NPERR = mean(x = NPERR, w = IPONDI))
-```
-
-### La fonction `summarize`
-
-La fonction `summarize` permet de résumer cette information de groupe en un tableau synthétique.
-
-```{r}
-rp19 %>%
-  filter(LPRM == 1) %>%
-  group_by(arrondissements) %>%
-  summarize(moy_NBPI = weighted.mean(x= NBPI, w = IPONDI),
-         moy_NPERR = weighted.mean(x = NPERR, w = IPONDI))
-```
-
-Représentez graphiquement cette information à l'aide de la fonction `geom_point` qui crée un nuage de points.
-
-```{r}
-rp19 %>%
-  filter(LPRM == "1") %>% # La personne de référence du ménage
-  group_by(arrondissements) %>%
-  summarize(moy_NBPI = weighted.mean(x = NBPI, w = IPONDI),
-            moy_NPERR = weighted.mean(x = NPERR, w = IPONDI)) %>%
-  ggplot() + 
-  geom_point(
-    aes(x = moy_NBPI,
-        y = moy_NPERR))
-```
-
-Associez les points dans le plan en deux dimensions au nom des arrondissements en remplaçant `geom_point` par `geom_text`.
-
-```{r}
-rp19 %>%
-  filter(LPRM == "1") %>% # La personne de référence du ménage
-  group_by(arrondissements) %>%
-  summarize(moy_NBPI = weighted.mean(x = NBPI, w = IPONDI),
-            moy_NPERR = weighted.mean(x = NPERR, w = IPONDI)) %>%
-  ggplot() +
-  geom_text(
-    aes(x = moy_NBPI,
-        y = moy_NPERR,
-        label = arrondissements))
-```
