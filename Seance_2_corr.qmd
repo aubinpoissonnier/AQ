@@ -252,19 +252,15 @@ rp$immi == 1 &
   rp$inatc == 2)
 
 # 6
-rp$immi ==1 &
+rp$immi == 1 &
   rp$stocd != 10
 ```
 
 ## Le recodage sous condition
 
-```{r}
-library(tidyverse)
-```
+La fonction `if_else` permet de faire une action sous condition : si l'âge est supérieur à 18, donne la valeur "majeur.e", sinon donne la valeur "mineur.e". case_when étend ce fonctionnement à plus d'une possibilité : si l'âge est supérieur à 18 donne "majeur.e", si l'âge est compris entre 18 et 64 donne "adulte", si l'âge est supérieur à 64 donne "senior".
 
-La fonction ifelse permet de faire une action sous condition : si l'âge est supérieur à 18, donne la valeur "majeur.e", sinon donne la valeur "mineur.e". case_when étend ce fonctionnement à plus d'une possibilité : si l'âge est supérieur à 18 donne "majeur.e", si l'âge est compris entre 18 et 64 donne "adulte", si l'âge est supérieur à 64 donne "senior".
-
-Il faut associer ces fonctions à d'autres fonctions qui disent à R quoi faire avec le tableau. La fonction mutate permet de créer une nouvelle colonne. On pourra dire à R : crée une nouvelle colonne (mutate) à partir d'un test sur la valeur initiale de la variable (ifelse).
+Il faut associer ces fonctions à d'autres fonctions qui disent à R quoi faire avec le tableau. La fonction `mutate` permet de créer une nouvelle colonne. On pourra dire à R : crée une nouvelle colonne (`mutate`) à partir d'un test sur la valeur initiale de la variable (`if_else`).
 
 ```{r}
 # Voici deux versions du codage de l'âge des personnes recensées, soit la variable agerev. La première est lisible, la deuxième est commentée ligne par ligne.
@@ -273,7 +269,7 @@ Il faut associer ces fonctions à d'autres fonctions qui disent à R quoi faire 
 rp <- mutate(
   rp,
   age_rec = 
-    ifelse(
+    if_else(
       agerev > 17,
       "Majeur.e",
       "Mineur.e"
@@ -289,14 +285,14 @@ rp <-
     # Le deuxième argument de mutate, le nom de la colonne à créer (à gauche du =) et la valeur que je lui donne (à droite du =)
     age_rec = 
       # Elle sera créée à l'aide du test opérée par la fonction ifelse
-      ifelse(
+      if_else(
         # Le premier argument de ifelse, la condition
         agerev > 17,
         # Le deuxième argument de ifelse, la valeur à donner si la condition est vérifiée
         "Majeur.e", 
         # Le troisième argument de ] ifelse, la valeur à donner si la condition n'est pas vérifié
         "Mineur.e"
-        # Je ferme la parenthèse de la fonction ifelse
+        # Je ferme la parenthèse de la fonction if_else
       )
     # Je ferme la parenthèse de la fonction mutate
   ) 
@@ -343,7 +339,7 @@ rp <-
   )
 ```
 
-Nous n'avons pas spécifié la nature de notre nouvelle colonne/vecteur. On cherche ici à créer un facteur puisqu'on a une variable catégorielle. La fonction \``fct` permet de créer un vecteur et de spécifier l'ordre de ses modalités (quand on fera des tableaux ou des graphiques, on voudra que "Senior" apparaisse en dernier, et non entre "Mineur.e" et "Majeur.e"
+Nous n'avons pas spécifié la nature de notre nouvelle colonne/vecteur. On cherche ici à créer un facteur puisqu'on a une variable catégorielle. La fonction `fct` permet de créer un vecteur et de spécifier l'ordre de ses modalités (quand on fera des tableaux ou des graphiques, on voudra que "Senior" apparaisse en dernier, et non entre "Mineur.e" et "Majeur.e"
 
 ```{r}
 # Un vecteur de type texte qui renseigne la catégorie d'âge de 6 personnes
@@ -366,23 +362,13 @@ cat_age <-
 table(cat_age)
 ```
 
-```{r}
-ggplot(vico) +
-  geom_point(
-    aes(x = RESNB,
-        y = AGE)
-  )
-```
+La fonction `irec` permet de réaliser ces recodages par le biais d'une interface.
 
-```{r}
-names(vico)
-```
+## Exercices
 
-```{r}
-ggplot(vico) +
-  geom_bar(aes(x = POL,
-               weights = POIDS_init))
-```
+1.  Créez une variable catégorielle à deux modalités : Immigré/Non immigré
+
+2.  Créez une variable catégorielle à trois modalités : Immigré étranger/immigré français/français non immigré
 
 # La visualisation de données avec ggplot2 - La logique additive
 
