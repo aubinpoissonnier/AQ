@@ -132,7 +132,6 @@ tab_etud <- wtd.table(rp$etud, rp$sexe, weights = rp$ipondi)
 rprop(tab_etud)
 ```
 
-
 # Tests et comparaison {#sec-tests}
 
 L'essentiel du recodage s'opère avec des instructions logiques simples (égal, différent, inférieur ou supérieur à) que l'on peut combiner sur une variable ou plusieurs variables). On utilise pour cela des tests.
@@ -256,15 +255,17 @@ Le terme *tidyverse* est une contraction de *tidy* (qu'on pourrait traduire par 
 Un des objectifs de ces extensions est de fournir des fonctions avec une syntaxe cohérente, qui fonctionnent bien ensemble, et qui retournent des résultats prévisibles. Nous allons recourrir à cette syntaxe pour transformer nos données.
 
 ## Filtrer des lignes et sélectionner des colonnes
+
 ### `filter`
-`filter` sélectionne des lignes d'une table selon une condition. On lui passe en paramètre un test, et seules les lignes pour lesquelles ce test renvoie `TRUE` (vrai) sont conservées. On réutilise donc les opérateurs logiques vus dans le cas des tests. Puisque le premier argument est le tableau en lui-même, il n'est plus nécessaire d'utiliser l'opérateur `$` et il suffit d'utiliser le nom dans colonnes pour filter. 
+
+`filter` sélectionne des lignes d'une table selon une condition. On lui passe en paramètre un test, et seules les lignes pour lesquelles ce test renvoie `TRUE` (vrai) sont conservées. On réutilise donc les opérateurs logiques vus dans le cas des tests. Puisque le premier argument est le tableau en lui-même, il n'est plus nécessaire d'utiliser l'opérateur `$` et il suffit d'utiliser le nom dans colonnes pour filter.
 
 ```{r}
 # Filtre pour sélectionner les femmes
 rp_f <- filter(rp, sexe == 2)
 
 # Filtre pour sélectionner les femmes immigrées
-rp_f <- filter(rp, sexe == 2 & immi = 1)
+rp_f <- filter(rp, sexe == 2 & immi == 1)
 ```
 
 On peut également placer des fonctions dans les tests, qui nous permettent par exemple de sélectionner les personnes qui sont plus âgées que l'âge médian.
@@ -275,7 +276,7 @@ rp_senior <- filter(rp, agerev > median(agerev))
 
 ### `select`
 
-`select` permet de sélectionner des colonnes d'un tableau de données. 
+`select` permet de sélectionner des colonnes d'un tableau de données.
 
 ```{r}
 # Sélectionner uniquement les colonnes du sexe et de l'âge
@@ -290,10 +291,10 @@ select(airports, -sexe, -age)
 ```
 
 ## Créer une colonne et recoder sous conditions
-### `mutate`
-La fonction `mutate` permet de créer une nouvelle colonne. C'est une alternative à la méthode de base avec l'opétaeur $.
-Le premier type de recodage consiste à changer la nature d'une colonne. On vérifie la nature d'une colonne avec la fonction `class` et on peut la modifier avec les fonctions de la forme `as.nature_désirée` : `as.integer`, `as.character` etc.
 
+### `mutate`
+
+La fonction `mutate` permet de créer une nouvelle colonne. C'est une alternative à la méthode de base avec l'opétaeur \$. Le premier type de recodage consiste à changer la nature d'une colonne. On vérifie la nature d'une colonne avec la fonction `class` et on peut la modifier avec les fonctions de la forme `as.nature_désirée` : `as.integer`, `as.character` etc.
 
 ```{r}
 # Vérifier la nature de la variable
@@ -401,8 +402,8 @@ rp <-
   )
 ```
 
+### `fct`
 
-### `fct` 
 Nous n'avons pas spécifié la nature de notre nouvelle colonne/vecteur. On cherche ici à créer un facteur puisqu'on a une variable catégorielle. La fonction `fct` permet de créer un vecteur et de spécifier l'ordre de ses modalités (quand on fera des tableaux ou des graphiques, on voudra que "Senior" apparaisse en dernier, et non entre "Mineur.e" et "Majeur.e"
 
 ```{r}
@@ -418,26 +419,69 @@ table(cat_age)
 # La catégorie adulte apparaît avant mineur.e
 # On le transforme en facteur
 cat_age <-
-  fct(cat_age, # Le premier argument, le facteur à transformer
-      levels = # Le deuxième argument, les modalités (levels) avec l'ordre d'apparition 
-        c("Mineur.e", "Adulte", "Senior")
+  fct(
+    # Le premier argument, le facteur à transformer
+    cat_age, 
+      # Le deuxième argument, les modalités (levels) avec l'ordre d'apparition
+      levels =  c("Mineur.e", "Adulte", "Senior")
       )
 # Le problème est résolu
 table(cat_age)
 ```
 
-La fonction `irec` permet de réaliser ces recodages par le biais d'une interface.
+Finalement, la fonction `irec` permet de réaliser le recodage d'une variable catégorielle par le biais d'une interface. Elle vous permet de changer les modalités d'une variable, par exemple passer d'un codage numérique aux étiquettes en texte, en faisant appel à la fonction `fct_recode`. Elle n'est à lancer qu'une fois pour obtenir le code et peut être retirée par la suite.
+
+```{r}
+#| eval: false
+
+# Recodage interactif de la variable sexe
+irec(rp$sexe)
+
+## Recoding rp$sexe into rp$sexe_rec
+rp$sexe_rec <- rp$sexe %>%
+  as.character() %>%
+  fct_recode(
+    "Hommes" = "1",
+    "Femmes" = "2"
+  )
+```
 
 ## Exercices
 
-1.  Créez une variable catégorielle à deux modalités : Immigré/Non immigré
+1.  Créez une variable catégorielle appelée `immigre` à deux modalités : Immigré/Non immigré
 
-2.  Créez une variable catégorielle à trois modalités : Immigré étranger/immigré français/français non immigré
+2.  Créez une variable catégorielle `stat_immi` à trois modalités : Immigré étranger/immigré français/français non immigré
 
 ```{r}
+# 1
+rp <-
+  mutate(
+    rp,
+    immigre = 
+      fct(
+        if_else(immi == 1, "Immigré", "Non immigré"),
+        levels = c("Immigré", "Non immigré")
+  )
+  )
+names(rp)
 
+# 2
+rp <-
+  mutate(
+    rp,
+    stat_immi =
+      fct(
+        case_when(
+          immi == 1 & inatc == 2 ~ "Immigré étranger",
+          immi == 1 & inatc == 1 ~ "Immigré français",
+          immi == 2 ~ "Français non immigré"
+        ),
+        levels = c("Immigré étranger",
+                   "Immigré français",
+                   "Français non immigré")
+      )
+  )
 ```
-
 
 # La visualisation de données avec ggplot2 - La logique additive
 
