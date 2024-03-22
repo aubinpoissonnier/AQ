@@ -109,28 +109,19 @@ La mise en forme des tableaux sur R et leur exportation demande de nombreuses é
 1.  Déterminez la part de la population qui est étudiante (= lyonnais·es qui sont inscrit·es dans un établissement d'enseignement supérieur)
 
 ```{r}
-# On calcul les effectifs avec un tri à plat
-tab_etud <- wtd.table(rp$etud, weights = rp$ipondi)
-# Puis la proportion
-proportions(tab_etud)
+
 ```
 
 2.  Déterminez pour les hommes et pour les femmes la part d'étudiant·es
 
 ```{r}
-# On calcul les effectifs avec un tri croisé
-tab_etud <- wtd.table(rp$sexe, rp$etud, weights = rp$ipondi)
-# Puis la proportion
-rprop(tab_etud)
+
 ```
 
 3.  Déterminez la part de femmes et d'hommes chez les étudiant·es et chez les non étudiant·es
 
 ```{r}
-# On calcul les effectifs avec un tri croisé en inversant les variables
-tab_etud <- wtd.table(rp$etud, rp$sexe, weights = rp$ipondi)
-# Puis la proportion
-rprop(tab_etud)
+
 ```
 
 # Tests logiques
@@ -210,33 +201,7 @@ Appliquez un test sur les habitant·es de Lyon qui vérifie si ils et elles sont
 6.  Immigré·es pas propriétaires
 
 ```{r}
-# 1
-rp$immi == 1
 
-# 2
-rp$immi == 1 & 
-  rp$agerev > 17
-
-# 3 
-rp$immi == 1 &
-  rp$stat_conj %in% 1:2
-
-# 4
-rp$immi == 1 &
-  rp$stat_conj %in% 1:2 &
-  rp$inatc == 1
-
-# 5
-(rp$immi == 1 &
-  rp$stat_conj == 1 &
-    rp$inatc == 1) |
-  (rp$immi == 1 &
-  rp$stat_conj == 2 &
-  rp$inatc == 2)
-
-# 6
-rp$immi == 1 &
-  rp$stocd != 10
 ```
 
 # Le test du Khi2
@@ -495,34 +460,7 @@ rp$sexe_rec <- rp$sexe %>%
 2.  Créez une variable catégorielle `stat_immi` à trois modalités : Immigré étranger/immigré français/français non immigré
 
 ```{r}
-# 1
-rp <-
-  mutate(
-    rp,
-    immigre = 
-      fct(
-        if_else(immi == 1, "Immigré", "Non immigré"),
-        levels = c("Immigré", "Non immigré")
-  )
-  )
-names(rp)
 
-# 2
-rp <-
-  mutate(
-    rp,
-    stat_immi =
-      fct(
-        case_when(
-          immi == 1 & inatc == 2 ~ "Immigré étranger",
-          immi == 1 & inatc == 1 ~ "Immigré français",
-          immi == 2 ~ "Français non immigré"
-        ),
-        levels = c("Immigré étranger",
-                   "Immigré français",
-                   "Français non immigré")
-      )
-  )
 ```
 
 ## Calculer des indicateurs dans des sous-groupes
@@ -581,35 +519,7 @@ rp$dif_age_m
 4.  Créez une colonne qui fais la différence entre l'âge individuel et l'âge moyen `age_immisexe`
 
 ```{r}
-# 1
-summarize(
-  rp,
-  age_m = mean(agerev),
-  .by = immi
-)
 
-# 2
-summarize(
-  rp,
-  age_m = mean(agerev),
-  .by = c(immi, sexe)
-)
-
-# 3
-rp <-
-  mutate(
-    rp,
-    age_m = mean(agerev),
-    .by = c(immi, sexe)
-  )
-
-
-# 4
-rp <-
-  mutate(
-    rp,
-    diff_age_m = agerev - age_m,
-  )
 ```
 
 # La visualisation de données avec ggplot2
@@ -698,30 +608,7 @@ Il faut bien distinguer deux types de commandes données aux fonctions `geom_`. 
 4.  Ajoutez l'argument `fill = sexe` dans la fonction `geom` à l'intérieur d'`aes()`
 
 ```{r}
-# 1
-rp <-
-  rp %>%
-  mutate(
-    sexe = 
-      fct(
-        ifelse(sexe == 1, "Homme", "Femme"),
-        levels = c("Femme", "Homme"))
-  )
-```
 
-```{r}
-# 2
-ggplot(rp) +
-  geom_bar(aes(x = arrondissements))
-
-# 3
-ggplot(rp) +
-  geom_bar(aes(x = arrondissements),
-           fill = "red")
-# 4
-ggplot(rp) +
-  geom_bar(aes(x = arrondissements,
-               fill = sexe))
 ```
 
 ### La pondération
@@ -748,24 +635,7 @@ ggplot(rp) +
 3.  Ajoutez l'argument `binwidth = 1` dans la fonction `geom_histogram` et observez le résultat
 
 ```{r}
-# 1
-# On vérifie la nature de la colonne
-class(rp$agerev)
 
-# On construit un histogramme
-ggplot(rp) +
-  geom_histogram(aes(x = agerev))
-
-
-# 2
-ggplot(rp) +
-  geom_histogram(aes(x = agerev),
-                 bins = 10)
-
-# 3
-ggplot(rp) +
-  geom_histogram(aes(x = agerev),
-                 binwidth = 1)
 ```
 
 ### La boîte à moustaches
