@@ -407,6 +407,20 @@ rp <-
   )
 ```
 
+## Exercices
+
+1.  Créez une nouvelle variable (colonne) qui vaut 1 si l'individu est propriétaire et 0 sinon.
+2.  Créez une nouvelle variable qui vaut 1 si l'individu est logé dans le secteur libre et 0 si l'individu est logé dans le secteur HLM.
+3.  Créez un nouveau tableau de données `rp_prop` qui ne contient que les individus propriétaires. Faites de même avec `rp_hlm` qui ne contient que les individus du secteur HLM.
+4.  Calculez la part de propriétaires à Lyon. Calculez la part de personnes logées dans le secteur HLM.
+5.  Créez une nouvelle variable dont les trois modalités seront d'être propriétaire, d'être locataire et d'être locataire HLM.
+6.  Calculez les effectifs et les parts de chacun de ces trois statuts d'occupation.
+7.  Créez une variable catégorielle synthétique qui croise le genre et le statut d'occupation du logement.
+
+```{r}
+
+```
+
 ### `fct`
 
 Nous n'avons pas spécifié la nature de notre nouvelle colonne/vecteur. On cherche ici à créer un facteur puisqu'on a une variable catégorielle. La fonction `fct` permet de créer un vecteur et de spécifier l'ordre de ses modalités (quand on fera des tableaux ou des graphiques, on voudra que "Senior" apparaisse en dernier, et non entre "Mineur.e" et "Majeur.e"
@@ -457,7 +471,11 @@ rp$sexe_rec <- rp$sexe %>%
 
 1.  Créez une variable catégorielle appelée `immigre` à deux modalités : Immigré/Non immigré
 
-2.  Créez une variable catégorielle `stat_immi` à trois modalités : Immigré étranger/immigré français/français non immigré
+2.  Créez une variable catégorielle du statut d'immigration `stat_immi` à trois modalités : Immigré étranger/immigré français/français non immigré
+
+3.  Répondez à cette question en produisant les traitements statistiques adaptés : à Lyon, les immigré.es sont-ils plus souvent propriétaires que les non-immigré.es ?
+
+4.  De même : à Lyon, le statut d'occupation du logement est-il dépendant du statut d'immigration ?
 
 ```{r}
 
