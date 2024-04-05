@@ -418,6 +418,84 @@ rp <-
 7.  Créez une variable catégorielle synthétique qui croise le genre et le statut d'occupation du logement.
 
 ```{r}
+# 1
+rp <-
+  mutate(
+    rp,
+    prop =
+      if_else(
+        stocd == 10,
+        1,
+        0
+      )
+  )
+
+# 2
+rp <- 
+  mutate(
+    rp,
+    libre = 
+      if_else(
+        stocd != 22,
+        1,
+        0
+      )
+  )
+
+# 3
+rp_prop <- filter(rp, prop == 1)
+rp_hlm <- filter(rp, libre != 1)
+
+# 4
+tab_prop <- wtd.table(rp$prop, weights = rp$ipondi)
+proportions(tab_prop)
+
+tab_libre <- wtd.table(rp$libre, weights = rp$ipondi)
+proportions(tab_libre)
+
+# 5
+table(rp$stocd)
+
+rp <- 
+  mutate(
+    rp,
+    stat_occ = 
+      case_when(
+        stocd == 10 ~ "Propriétaire",
+        stocd %in% c(21, 23, 30) ~ "Locataire",
+        stocd == 22 ~ "Locataire HLM"
+      )
+  )
+
+table(rp$stocd, rp$stat_occ, useNA = "always")
+
+# 5
+tab_stat_occ <- wtd.table(rp$stat_occ, weights = rp$ipondi, useNA = "always")
+proportions(tab_stat_occ)
+
+#
+rp <-
+  mutate(
+    rp,
+    occ_genre = 
+      case_when(
+        stat_occ == "Locataire" & sexe == 1 ~ "Homme locataire",
+        stat_occ == "Propriétaire" & sexe == 1 ~ "Homme propriétaire",
+        stat_occ == "Locataire HLM" & sexe == 1 ~ "Homme locataire HLM",
+        stat_occ == "Locataire" & sexe == 2 ~ "Femme locataire",
+        stat_occ == "Propriétaire" & sexe == 2 ~ "Femme propriétaire",
+         stat_occ == "Locataire HLM" & sexe == 2 ~ "Femme locataire HLM"
+      ),
+    occ_genre = fct(occ_genre,
+                    levels = c("Homme propriétaire",
+                               "Homme locataire",
+                               "Homme locataire HLM",
+                               "Femme propriétaire",
+                               "Femme locataire",
+                               "Femme locataire HLM"))
+  )
+
+table(rp$occ_genre)
 
 ```
 
@@ -455,6 +533,14 @@ Finalement, la fonction `irec` permet de réaliser le recodage d'une variable ca
 
 # Recodage interactif de la variable sexe
 irec(rp$sexe)
+
+## Recoding rp$sexe into rp$sexe_rec
+rp$sexe_rec <- rp$sexe %>%
+  as.character() %>%
+  fct_recode(
+    "Homme" = "1",
+    "Femme" = "2"
+  )
 ```
 
 ```{r}
@@ -465,6 +551,8 @@ rp$sexe_rec <- rp$sexe %>%
     "Hommes" = "1",
     "Femmes" = "2"
   )
+
+
 ```
 
 ## Exercices
@@ -478,6 +566,17 @@ rp$sexe_rec <- rp$sexe %>%
 4.  De même : à Lyon, le statut d'occupation du logement est-il dépendant du statut d'immigration ?
 
 ```{r}
+rp <-
+  mutate(
+    rp,
+    stat_immi =
+      if_else(
+        immi == 1,
+        "Immigré.e",
+        "Non immigré.e"
+      )
+  )
+
 
 ```
 
