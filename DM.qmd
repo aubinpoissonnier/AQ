@@ -181,3 +181,7 @@ Entraînez-vous à réaliser ces différentes tâches sur R en vous aidant si n�
 ```
 
 24. À l'aide de la fonction `summarize`, calculez la moyenne pondérée du nombre de voitures selon le sexe de la personne.
+
+```{r}
+
+```
