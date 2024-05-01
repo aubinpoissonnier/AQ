@@ -1,0 +1,17 @@
+---
+title: "DM"
+format: html
+editor: visual
+---
+
+# Données et packages
+
+```{r}
+install.packages("questionr")
+library(haven)
+library(tidyverse)
+library(questionr)
+
+download.file("https://data.sciencespo.fr/api/access/datafile/5682?format=tab&gbrecs=true",
+              "sven.tab")
+```
