@@ -1,0 +1,200 @@
+---
+title: "DM"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+# Données et packages
+
+```{r}
+install.packages("questionr")
+```
+
+```{r}
+library(haven)
+library(tidyverse)
+library(questionr)
+
+download.file("https://data.sciencespo.fr/api/access/datafile/5682?format=tab&gbrecs=true",
+              "sven.tab")
+sven <- read_tsv("sven.tab")
+sven$voitures_n <- 
+  case_when(sven$nombre_voitures == 1 ~ 0,
+            sven$nombre_voitures == 2 ~ 1,
+            sven$nombre_voitures == 3 ~ 2,
+            sven$nombre_voitures == 4 ~ 3,
+            sven$nombre_voitures %in% c(6, 8, 9) ~ NA)
+```
+
+## Présentation de l'enquête
+
+Cette base de données a été construite à partir des données de l’enquête Styles de vie et
+Environnement (2017).
+L'enquête Styles de vie et Environnement (SVEN) propose d’explorer conjointement les
+représentations et attitudes des Français à l’égard des questions d’environnement et l’impact environnemental de leurs modes de vie. L'enquête vise à explorer les implications sociales et politiques du consensus scientifique et politique qui existe aujourd’hui autour de l’idée que les caractéristiques des modes de vie courants dans les sociétés occidentales contemporaines sont à l’origine d’importantes externalités environnementales qui contribuent fortement au changement climatique et à l’épuisement des ressources, aussi bien qu’à la réduction de la biodiversité.
+
+## Accès au dictionnaire des codes
+
+Le dictionnaire des codes est disponible en [cliquant sur ce lien](https://data.sciencespo.fr/api/access/datafile/5684?gbrecs=true).
+
+## Consignes
+
+Entraînez-vous à réaliser ces différentes tâches sur R en vous aidant si nécessaire du corrigé des 2 TPs. Une version corrigée du DM est accessible en ouvrant le script `DM_corr.qmd`. Vous pouvez l'utiliser pour vérifier vos réponses mais essayez de ne pas regarder les solutions pendant que vous réalisez les exercices.
+
+1.  Affichez les dimensions (nombre de lignes et de colonnes) du tableau de données `sven`
+2.  Affichez le nom des colonnes
+3.  Affichez la colonne `ID`
+4.  Affichez la colonne `ponderation`
+5.  Affichez les différentes valeurs (modalités de la variable) que prend la colonne `engagement_impots`
+6.  Faites un tri à plat de la colonne `engagement_impots`
+7.  Faites un tri à plat pondéré de la colonne `engagement_impots`
+8.  Calculez les proportions de ce tri à plat pondéré
+9.  Arrondissez à 2 chiffres après la virgule les proportions du tableau
+10. Recodez de 2 façons, avec le langage R de base et avec la fonction `mutate`, la colonne `engagement_impots` pour que les réponses `9` deviennent des `NA`
+11. Créez un test logique qui teste si la variable que vous venez de recoder `engagement_impots_rec` vaut `NA`
+12. Appliquez la fonction `table` à ce test pour compter le nombre de valeurs manquantes codées en `NA`
+13. Faites un nouveau tri à plat pondéré et calculez les proportions de cette nouvelle variable recodée
+14. Recodez la variable `engagement_impots`, cette fois-ci avec la fonction `irec`, pour nommer chacune des modalités (1 = "Tout à fait d'accord"). N'oubliez pas de coder la valeur 9 en `NA`.
+15. Refaites la même chose que pour #13 avec la nouvelle variable recodée.
+16. Recodez la variable d'échelle `politique_gauche_droite` en choisissant des catégories pertinentes. Le but est d'obtenir une variable catégorielle de positionnement politique avec un nombre plus restreint de modalités.
+17. Faites un tri à plat pondéré avec proportions de cette nouvelle variable.
+18. Croisez la nouvelle variable de positionnement politique à la variable recodée sur les impôts. Affichez les proportions de ce tri croisé et entraînez vous à la lecture.
+19. Faites un test du Khi2 (non pondéré) et interprétez le résultat.
+20. Créez grâce aux fonctions `mutate` et `case_when` une variable à 3 modalités sur le caractère écologique du mode de transport. Elle opposera les personnes prenant la voiture ou la moto mais jamais d'autres modes de transport; les personnes utilisant uniquement un mode de transport vert (en commun, vélo, marche, train); les personnes utilisant l'un ou l'autre. Réfléchissez bien aux variables et aux conditions logiques nécessaires pour créer une telle variable.
+21. Créez un tableau de donnée ne contenant que les femmes
+22. La variable `voitures_n` est une variable numérique qui compte le nombre de voitures du ménages. Calculez la moyenne, la médiane, les quartiles et les déciles de cette variable (tout en non pondéré).
+23. Calculez la moyenne pondérée du nombre de voitures
+24. À l'aide de la fonction `summarize`, calculez la moyenne pondérée du nombre de voitures selon le sexe de la personne.
+
+```{r}
+# 1
+dim(sven)
+# 2
+names(sven)
+# 3
+sven$ID
+# 4
+sven$ponderation
+# 5
+unique(sven$engagement_impots)
+# 6
+table(sven$engagement_impots)
+# 7
+wtd.table(sven$engagement_impots, weights = sven$ponderation)
+# 8
+tab_impots <- wtd.table(sven$engagement_impots, weights = sven$ponderation)
+proportions(tab_impots)
+# 9
+tab_impots <- wtd.table(sven$engagement_impots, weights = sven$ponderation)
+tab_impots <- proportions(tab_impots)
+round(tab_impots, 2)
+# 10
+# Solution 1 code R de base
+sven$engagement_impots_rec <- 
+  if_else(sven$engagement_impots == 9, NA, sven$engagement_impots)
+# Solution 2 code tidyverse
+sven <-
+  mutate(sven,
+         engagement_impots_rec =
+           if_else(engagement_impots == 9, NA, engagement_impots))
+# 11
+is.na(sven$engagement_impots_rec)
+# 12
+table(is.na(sven$engagement_impots_rec))
+# 13
+tab_impots <- wtd.table(sven$engagement_impots_rec, weights = sven$ponderation)
+tab_impots <- proportions(tab_impots)
+round(tab_impots, 2)
+# 14
+irec(sven$engagement_impots)
+
+## Recoding sven$engagement_impots into sven$engagement_impots_rec
+sven$engagement_impots_rec <- sven$engagement_impots %>%
+  as.character() %>%
+  fct_recode(
+    "Tout à fait d'accord" = "1",
+    "Plutôt d'accord" = "2",
+    "Plutôt pas d'accord" = "3",
+    "Pas du tout d'accord" = "4",
+    "Je ne sais pas" = "5",
+    NULL = "9"
+  )
+
+# 15
+tab_impots <- wtd.table(sven$engagement_impots_rec, weights = sven$ponderation)
+tab_impots <- proportions(tab_impots)
+round(tab_impots, 2)
+
+# 16
+irec(sven$politique_gauche_droite)
+
+## Recoding sven$politique_gauche_droite into sven$politique_gauche_droite_rec
+sven$politique_gauche_droite_rec <- sven$politique_gauche_droite %>%
+  as.character() %>%
+  fct_recode(
+    "Très à gauche" = "1",
+    "Très à gauche" = "2",
+    "Gauche" = "3",
+    "Gauche" = "4",
+    "Gauche" = "5",
+    "Centre" = "6",
+    "Droite" = "7",
+    "Droite" = "8",
+    "Droite" = "9",
+    "Très à droite" = "10",
+    "Très à droite" = "11",
+    NULL = "77",
+    NULL = "88"
+  )
+
+# 17
+wtd.table(sven$politique_gauche_droite_rec, sven$engagement_impots_rec, weights = sven$ponderation)
+
+# 18
+tab_pol_impots <- wtd.table(sven$politique_gauche_droite_rec, sven$engagement_impots_rec, weights = sven$ponderation)
+rprop(tab_pol_impots)
+
+# 19
+chisq.test(sven$politique_gauche_droite_rec, sven$engagement_impots_rec)
+
+# 20
+sven <-
+  mutate(sven,
+         transports =
+           case_when(
+             (travail_voiture == 1 |
+               travail_moto == 1) &
+               (travail_transports_en_commun != 1 &
+               travail_train != 1 &
+               travail_velo_marche != 1) ~ "Voiture ou moto",
+             (travail_voiture == 1 |
+               travail_moto == 1) &
+               (travail_transports_en_commun == 1 |
+               travail_train == 1 |
+               travail_velo_marche == 1) ~ "Hybride",
+             (travail_voiture != 1 &
+               travail_moto != 1) &
+               (travail_transports_en_commun == 1 |
+               travail_train == 1 |
+               travail_velo_marche == 1) ~ "Transport vert"
+           ))
+
+# 21
+sven_f <- filter(sven, demo_sexe == 2)
+# 22
+# Moyenne médiane quartiles en 1 fonction
+summary(sven$voitures_n)
+# Décomposé, avec déciles en plus
+mean(sven$voitures_n)
+median(sven$voitures_n)
+quantile(sven$voitures_n, probs = c(0.25, 0.75))
+quantile(sven$voitures_n, probs = c(0.1, 0.9))
+# 23
+wtd.mean(sven$voitures_n, weights = sven$ponderation)
+# 24
+summarize(sven,
+          wtd.mean(voitures_n, weights = ponderation),
+          .by = demo_sexe)
+```
