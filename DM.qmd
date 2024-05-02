@@ -9,14 +9,20 @@ editor_options:
 # Données et packages
 
 ```{r}
-install.packages("questionr")
-```
+# Package names
+packages <- c("haven", "tidyverse", "questionr")
 
-```{r}
-library(haven)
-library(tidyverse)
-library(questionr)
+# Install packages not yet installed
+installed_packages <- packages %in% rownames(installed.packages())
+if (any(installed_packages == FALSE)) {
+  install.packages(packages[!installed_packages])
+}
 
+# Packages loading
+invisible(lapply(packages, library, character.only = TRUE))
+
+
+# Données
 download.file("https://data.sciencespo.fr/api/access/datafile/5682?format=tab&gbrecs=true",
               "sven.tab")
 sven <- read_tsv("sven.tab")
