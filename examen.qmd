@@ -1,0 +1,161 @@
+---
+title: "Examen"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+# Téléchargement des données et packages
+
+```{r}
+# Packages
+library(tidyverse)
+library(questionr)
+
+# Données 
+download.file("https://vico.hypotheses.org/files/2021/03/vico2020.csv",
+              "data/vico2020.csv")
+vico <- read.csv2("data/vico2020.csv", encoding = "UTF-8") |>
+  mutate(SITCONJ = if_else(SITCONJ == "", NA, SITCONJ))
+```
+
+# Questions sur le cours (1/3 de la note)
+
+1.  Le ministère de la transition écologique veut estimer la fréquence à laquelle les français.es prennent l'avion. Il organise pour cela une enquête en face à face menée dans les aéroports du territoire qui consiste à demander aux voyageur.es combien de fois ils ou elles ont pris l'avion cette année. Cette méthode permet-elle d'obtenir une bonne estimation ?
+
+Réponse :
+
+2.  Une enquête sur les conditions de travail contient une variable quantitative du salaire mensuel des individus interrogés. Pourquoi pourrait-on vouloir créer des catégories à partir de cette variable quantitative continue (le salaire exact en euros) ? Présentez au moins deux façons de construire ces catégories en justifiant l'intérêt des catégories obtenues.
+
+Réponse :
+
+3.  Une enquête sur les pratiques sportives a été réalisée auprès de 5 000 individus tirés aléatoirement. Les personnes chargées de l'analyse réalisent avec ces données un tri croisé entre le sexe de l'individu et l'intensité de la pratique sportive (jamais; 1 fois par semaine; 2 à 3 fois par semaine; 4 fois ou plus par semaine) révèle que les hommes sont sur-représentés parmi les sportifs qui ont une pratique intense (2 à 3 fois et 4 fois ou plus par semiane).
+    -   Quelle type de relation cherche-t-on à identifier par ce tri croisé et quelle est la variable explicative et la variable expliquée ?
+
+    -   Peut-on à ce stade affirmer que dans la société française, les hommes pratiquent plus intensément le sport que les femmes ?
+
+Réponse :
+
+4.  Les personnes chargées de l'analyse de l'enquête sur le sport décident de réaliser un test du Khi2 à partir des variables du sexe et de l'intensité de la pratique sportive. Elles décident de fixer à 10% le seuil acceptable pour la p-valeur. Expliquez ce que cela signifie, ce que dans le cadre de l'enquête on peut conclure si la p-valeur obtenue est au-dessous de ce seuil; et finalement ce qu'on peut conclure si la p-valeur obtenue est au-dessus de ce seuil.
+
+Réponse :
+
+# Interprétation de graphiques (1/3 de la note)
+
+Proposez une lecture des graphiques suivants en respectant les normes de rédaction vues en cours et indiquez quelles sont les conclusions auxquelles ils permettent d'aboutir. Il n'est pas nécessaire de commenter l'ensemble des informations présentées pour que l'interprétation des graphiques soit complète.
+
+1.  Évolution de la précarité de l'emploi salarié selon l'âge
+
+![](images/emploi_age.png){fig-align="center" width="428"}
+
+Réponse :
+
+2.  Contraintes de temps de travail subies par les salariés en horaires atypiques
+
+![](images/horaires.png){fig-align="center" width="527"}
+
+Réponse :
+
+3.  Nombre de livres lus selon la catégorie sociale
+
+![](images/lecture.png){fig-align="center" width="600"}
+
+Réponse :
+
+4.  Évolution de la part de non-lecteurs selon la catégorie sociale
+
+![](images/lecteurs-01.png){fig-align="center" width="477"}
+
+Réponse :
+
+# Pratique de R (1/3 de la note)
+
+1.  La colonne `AMIS` correspond à la variable de la fréquence à laquelle les personnes enquêté·es ont vu leur ami·es depuis le début du confinement. Les non-réponses sont codées en tant que chaîne de texte vide : `""`. Recodez la variable `AMIS` pour que les non-réponses prennent la valeur `NA` plutôt que `""`.
+
+```{r Q1}
+
+```
+
+2.  Réalisez un tri à plat pondéré de la variable `AMIS`.
+
+```{r}
+
+```
+
+3.  Calculez maintenant les proportions associées à ce tri à plat pondéré de la variable `AMIS`. Écrivez une phrase de lecture du résultat obtenu.
+
+```{r}
+
+```
+
+Réponse :
+
+4.  À l'aide la variable `SEXE`, comparez par un tri croisé la fréquence en proportions à laquelle les femmes et les hommes ont vu leur ami·es depuis le début du confinement.
+
+```{r}
+
+```
+
+Réponse :
+
+5.  Ces deux variables sont-elles significativement dépendantes au seuil de 10% (pas besoin d'utiliser la pondération ici) ? Expliquez comment vous vérifiez cela et concluez avec une phrase complète de lecture du résultat.
+
+```{r}
+
+```
+
+5.  **Uniquement chez les hommes**, à l'aide de la variable `SITCONJ` qui renseigne si la personne est en couple, calculez la fréquence en proportions à laquelle les personnes en couple ont vu leur ami·es depuis le début du confinement par rapport aux personnes célibataires.
+
+    ```{r}
+
+    ```
+
+    Réponse :
+
+6.  Quel est l'âge moyen de la population enquêtée ?
+
+    ```{r}
+
+    ```
+
+    Réponse :
+
+7.  En moyenne, les personnes qui ont changé de logement depuis le début du confinement (variable `LOGAUTRE`) sont-elles plus âgées ou moins âgées que les personnes qui sont restées dans le même logement ?
+
+    ```{r}
+
+    ```
+
+8.  Utilisez la fonction `irec` pour recoder la variable `CONTROL` pour raccourcir le nom des modalités : "Jamais", "Une fois", "Plus d'une fois".
+
+    ```{r}
+
+    ```
+
+```{=html}
+<!-- -->
+```
+9.  Utilisez la fonction `iorder` pour recoder la variable `CONTROL_rec` que vous venez de recodez pour choisir le bon ordre des modalités.
+
+    ```{r}
+
+    ```
+
+```{=html}
+<!-- -->
+```
+10. À l'aide des variables `RESNB` et `RESISOL`, créez une variable synthétique `SEULE_BIN` qui vaut "Jamais seule" si la personne vivait avec au moins une autre personne et qu'elle n'avait jamais accès à une pièce isolée, "Seule" dans tous les autres cas.
+
+    ```{r}
+
+    ```
+
+```{=html}
+<!-- -->
+```
+11. À l'aide des variables `RESNB` et `RESISOL`, créez une variable synthétique `SEULE` qui vaut "Jamais seule" si la personne vivait avec au moins une autre personne et qu'elle n'avait jamais accès à une pièce isolée; "Possibilité d'être seule" si la personne vivait avec au moins une autre personne mais qu'elle avait accès à une pièce isolée; "Seule" si la personne vivait seule.
+
+```{r}
+
+```
