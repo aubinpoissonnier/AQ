@@ -77,7 +77,7 @@ Réponse :
 
 ```{r}
 wtd.table(vico$SEXE, vico$AMIS, weights = vico$POIDS_init) |>
-  rprop()
+  lprop()
 ```
 
 Réponse :
