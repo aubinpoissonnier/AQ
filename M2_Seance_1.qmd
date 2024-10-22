@@ -1,10 +1,23 @@
 ---
-title: "BONUS_ggplot"
+title: "La visualisation de données avec ggplot2"
 format: html
 editor: visual
+editor_options: 
+  chunk_output_type: console
 ---
 
-# La visualisation de données avec ggplot2
+# Données
+
+```{r}
+#| include: false
+library(questionr)
+library(tidyverse)
+data("hdv2003")
+rp <- aws.s3::s3read_using(FUN = data.table::fread,
+                           object = "/diffusion/RP/rplyon_2017.csv",
+                           bucket = "aubinpoissonnier",
+                           opts = list("region" = ""))
+```
 
 ## La logique additive de ggplot2
 
@@ -91,29 +104,17 @@ Il faut bien distinguer deux types de commandes données aux fonctions `geom_`. 
 
 ```{r}
 # 1
-rp <-
-  rp %>%
-  mutate(
-    sexe = 
-      fct(
-        ifelse(sexe == 1, "Homme", "Femme"),
-        levels = c("Femme", "Homme"))
-  )
+
 ```
 
 ```{r}
 # 2
-ggplot(rp) +
-  geom_bar(aes(x = arrondissements))
+
 
 # 3
-ggplot(rp) +
-  geom_bar(aes(x = arrondissements),
-           fill = "red")
+
 # 4
-ggplot(rp) +
-  geom_bar(aes(x = arrondissements,
-               fill = sexe))
+
 ```
 
 ### La pondération
@@ -128,9 +129,7 @@ The following aesthetics were dropped during statistical transformation: weights
 
 ```{r}
 # Diagramme en barres pondérées
-ggplot(rp) +
-  geom_bar(aes(x = arrondissements,
-               weight = ipondi))
+
 ```
 
 ## Exercices - Les histogrammes
@@ -141,23 +140,13 @@ ggplot(rp) +
 
 ```{r}
 # 1
-# On vérifie la nature de la colonne
-class(rp$agerev)
-
-# On construit un histogramme
-ggplot(rp) +
-  geom_histogram(aes(x = agerev))
 
 
 # 2
-ggplot(rp) +
-  geom_histogram(aes(x = agerev),
-                 bins = 10)
+
 
 # 3
-ggplot(rp) +
-  geom_histogram(aes(x = agerev),
-                 binwidth = 1)
+
 ```
 
 ### La boîte à moustaches

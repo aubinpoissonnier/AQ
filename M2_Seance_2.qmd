@@ -1,0 +1,27 @@
+---
+title: "La corrélation et les modèles de régression linéaire"
+format: html
+editor: visual
+---
+
+```{r}
+#| include: false
+library(questionr)
+library(tidyverse)
+bac <- aws.s3::s3read_using(FUN = data.table::fread,
+                           object = "/diffusion/bac.csv",
+                           bucket = "aubinpoissonnier",
+                           opts = list("region" = ""))
+```
+
+Le tableau de données `bac` recense les résultats au baccalauréat de 2322 lycées et il fournit leur indice de position sociale dans la colonne `IPS`.
+
+# La corrélation linéaire
+Avec la fonction `cor`, déterminez que vaut la corrélation entre l'indice de position sociale et le taux de réussite au bac en série générale; le taux de mentions en série générale, le taux de mentions toutes séries confondues ?
+
+```{r}
+
+weight
+```
+
+
