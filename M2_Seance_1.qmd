@@ -56,8 +56,7 @@ class(rp$arm)
 # Les arrondissements sont considérés comme des valeurs numériques.
 # Il faut les convertir en facteurs. Profitons-en pour recoder.
 rp <-
-  rp %>%
-  mutate(
+  mutate(rp,
     arrondissements =
       fct(
         case_when(
