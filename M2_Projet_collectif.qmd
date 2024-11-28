@@ -9,11 +9,12 @@ Lignes de code à lancer pour charger les données.
 ## Packages
 library(tidyverse)
 library(data.table)
+library(questionr)
 ## Données
 df <- 
    aws.s3::s3read_using(
     FUN = data.table::fread,
-    object = "/analyse_quanti/salaries_2021.csv",
+    object = "/diffusion/salaries_2021.csv",
     bucket = "aubinpoissonnier",
     opts = list("region" = "")
   )
