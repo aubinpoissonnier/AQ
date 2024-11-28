@@ -1,0 +1,57 @@
+---
+title: "Les modèles de régression logistique"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+# Chargement des packages
+library(tidyverse)
+library(questionr)
+
+# Chargement des données
+pisa <- aws.s3::s3read_using(FUN = readRDS,
+                           object = "/diffusion/pisa.RDS",
+                           bucket = "aubinpoissonnier",
+                           opts = list("region" = "")) |>
+  mutate(poids = poids*(4613/sum(poids)))
+```
+
+
+On crée une variable de positionnement social en quintiles
+```{r}
+quant_pos_soc <- quantile(pisa$pos_soc, probs = c(0, 0.2, 0.4, 0.6, 0.8, 1), na.rm = T)
+# On crée une nouvelle variable
+pisa <-
+  pisa %>%
+  mutate(pos_soc_5c = 
+           cut(
+             x = pos_soc, 
+             breaks = quant_pos_soc,
+             labels = c("1er", "2ème", "3ème", "4ème", "5ème")
+           ))
+
+
+```
+
+On crée un modèle simple
+```{r}
+m1 <- glm(redouble ~ pos_soc_5c, 
+             family = binomial("logit"),
+             data = pisa,
+          weights = pisa$poids)
+summary(m1)
+```
+
+On crée un modèle multiple
+```{r}
+m2 <- glm(redouble ~ pos_soc_5c +
+            sexe, 
+             family = binomial("logit"),
+             data = pisa,
+          weights = pisa$poids)
+summary(m2)
+```
+
