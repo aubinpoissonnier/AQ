@@ -1,0 +1,164 @@
+---
+title: "Examen 2024 M2 VEU"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+# Questions de cours
+
+## Question 1
+
+Le Ministère du Travail réalise une étude sur les facteurs du chômage dans les territoires. La personne chargée de l’étude calcule deux coefficients de corrélation entre le nombre d’emplois du territoire (variable 1) et le nombre d’habitant·es du territoire (variable 2), d’abord à l’échelle des communes (premier coefficient) puis à l’échelle des régions (deuxième coefficient).
+
+-   Pour les deux cas, expliquez ce qu’on peut comprendre si le coefficient obtenu est négatif, nul, ou positif.
+
+-   Le coefficient obtenu en travaillant à l’échelle communale est légèrement négatif alors que celui obtenu en travaillant à l’échelle régionale est légèrement positif. Comment pourriez-vous expliquer ce changement ?
+
+Réponse :
+
+## Question 2
+
+Des sociologues de la santé travaillent sur les accidents au travail. En faisant un tri croisé avec leurs données (significatif au seuil de 1% selon un test du Khi2), ils remarquent que les travailleur·ses qui se sont fait soigné·es dans des cliniques privées ont plus rarement gardé des séquelles de leur accident que les travailleur·ses qui se sont fait soigné·es à l’hôpital public. Peut-on conclure que les établissements privés soignent mieux que les établissements publics ?
+
+Réponse :
+
+## Question 3
+
+L’observatoire des inégalités veut réaliser une étude sur les inégalités salariales entre les hommes et les femmes. Il hésite entre deux mesures :
+
+-   L’écart moyen de salaire chez les hommes et chez les femmes
+
+-   Construire un modèle de régression linéaire qui explique l’écart de salaire entre les hommes et les femmes en contrôlant par le niveau de diplôme (variable 1), le secteur d’activité (variable 2) et le fait d’être à temps plein ou d’être à temps-partiel (variable 3).
+
+Présentez l’intérêt et les défauts de ces deux méthodes de mesure des inégalités salariales.
+
+Réponse :
+
+# Lecture de graphiques
+
+## Présentation du cas d'étude
+
+L'INED a réalisé une enquête visant à saisir l'importance des violences sexuelles dans les vies des hommes gays et bisexuels. Elle a fait passé un questionnaire auprès de 3 522 hommes ayant eu des rapports sexuels avec des hommes et s'identifiant comme homosexuels et bisexuels.
+
+Les enquêtés ont été questionnés sur leur identité, sur leurs pratiques sexuelles et sur les violences qu'ils ont subies dans l'enfance ou récemment. Une analyse des correspondances multiples a été réalisée pour créer 5 classes appelées "configurations sexuelles". Chaque homme enquêté a été rattaché à une de ces configurations (il ne présente pas forcément toutes les caractéristiques de cette classe, mais c'est celle qui lui correspond le mieux) :
+
+-   **La sociabilité sexuelle intense** (39 % des effectifs) : les hommes définis d'abord par leur identification homosexuelle et l'intensité de leur pratique sexuelle
+
+-   **La sociabilité sexuelle conjugale** (38% des effectifs) : les hommes définis d'abord par leur identification homosexuelle, le fait qu'ils soient en couple et leur nombre de partenaires plus faible
+
+-   **L'homo-bisexualité latérale** (14% des effectifs) : un groupe d'hommes dont une part importante se définit comme bisexuels plutôt qu'homosexuels et plus éloignés des figures de l'homosexualité masculine affirmée
+
+-   **Les violences sexuelles dans l'enfance** (6% des effectifs) : les hommes définis d'abord par les violences sexuelles qu'ils ont subies dans l'enfance et une sexualité moins bien acceptée par leur famillle
+
+-   **Les violences disséminées** (2% des effectifs) : les hommes définis d'abord par les violences sexuelles qu'ils ont subies à l'âge adulte
+
+## Lecture de tris croisés
+
+À l'aide du tableau résumant 6 tris croisés entre la configuration sexuelle d'appartenance et des variables de l'enquête, justifiez le descriptif donné ci-dessus des différentes configurations sexuelles. Il faudra formuler une analyse en terme de **sous-représentation et sur-représentation**, ce qui vous permettra de retrouver les caractéristiques saillantes de chaque configuration sexuelle.
+
+![](images/tris.png){width="1000"}
+
+Réponse :
+
+## Lecture d'un modèle de régression logistique
+
+Les auteur·es de l'étude ont décidé de construire plusieurs modèles de régression logistique pour évaluer le lien entre l'appartenance à une configuration sexuelle et quatre dimensions de la santé : le fait d'être séropositif, d'avoir des idées noires, d'avoir déjà fait une tentative de suicide au cours de la vie et le fait d'avoir été boulimique au cours de la vie.
+
+Les quatre modèles logistiques contiennent deux variables explicatives : la configuration sexuelle et l'âge. La première variable est la variable d'intérêt. Celle de l'âge a plutôt le statut de variable de contrôle (même si ses coefficients pourraient eux aussi faire l'objet d'une interprétation sociologique).
+
+Répondez aux questions suivantes en justifiant votre propos par une lecture **rigoureuse** des résultats des modèles.
+
+![](images/log.png)
+
+-   Les hommes appartenant à la configuration "violences sexuelles dans l'enfance" ont-ils plus une probabilité plus élevée d'être séropositifs que les hommes appartenant à la configuration "sociabilité sexuelle conjugale" ?
+
+-   Les hommes appartenant à la configuration "violences disséminées" ont-ils plus une probabilité plus élevée d'être séropositifs que les hommes appartenant à la configuration "sociabilité sexuelle conjugale" ?
+
+-   Les hommes appartenant à la configuration "violences sexuelles dans l'enfance" ont-ils plus une probabilité plus élevée d'avoir fait une tentative de suicide que les hommes appartenant à la configuration "sociabilité sexuelle intense" ?
+
+-   Le fait d'appartenir à la configuration "sociabilité sexuelle intense" plutôt que "sociabilité sexuelle conjugale" augmente-t-il la probabilité des idées noires uniquement pour les hommes de 30 à 39 ans ?
+
+-   Les hommes appartenant à la configuration "violences sexuelles dans l'enfance" ont-il la probabilité la plus élevée d'avoir été boulimique dans leur vie ?
+
+-   Les hommes qui ont moins de 30 ans ont-ils une probabilité plus élevée d'être séropositifs que les hommes de plus de 30 ans ?
+
+-   Les hommes appartenant à la catégorie "sociabilité sexuelle intense" **et** qui ont entre 20 et 29 ans ont-ils une probabilité plus basse d'être séropositifs que les hommes appartenant à la catégorie "sociabilité sexuelle intense" **et** qui ont 50 et 59 ans ?
+
+Réponse :
+
+# Pratique de R
+
+Lancez ce premier bloc de code qui télécharge une base de données recensant les caractéristiques de trois espèces de fleur différentes : la longueur et la largeur des sépales; la longueur et la largeur des pétales; la longueur de la tige. **La variable `poids` est la variable de pondération.**
+
+```{r}
+library(tidyverse)
+library(questionr)
+data(iris)
+
+iris$Stem.Length <- sample(1:10, 150, replace = T)
+iris$poids <- sample(seq(0.001, 10, 0.001), 150, replace = T)
+```
+
+Calculez les effectifs non pondérés des différentes espèces de fleur
+
+```{r}
+
+```
+
+Calculez les effectifs pondérés de chaque espèce de fleur
+
+```{r}
+
+```
+
+Calculez la moyenne pondérée de la longueur des pétales.
+
+```{r}
+
+```
+
+Calculez la moyenne pondérée de la longueur des tiges **selon l'espèce de fleur**
+
+```{r}
+
+```
+
+Calculez la variance pondérée de la longueur des tiges **selon l'espèce de fleur**
+
+```{r}
+
+```
+
+Construisez un nuage de points entre la longueur des pétales et la largeur des pétales **en colorant les points selon l'espèce de fleur.**
+
+```{r}
+
+```
+
+Construisez un modèle de régression linéaire qui explique la variation de la longueur des pétales en fonction de la largeur des pétales
+
+```{r}
+
+```
+
+Construisez un modèle de régression linéaire qui explique la variation de la longueur des pétales en fonction de la largeur des pétales **indépendamment de l'espèce de fleur**
+
+```{r}
+
+```
+
+Construisez un modèle de régression linéaire qui permet de vérifier si le lien entre la longueur des pétales et la largeur des pétales **est la même pour toutes les espèces de fleurs**
+
+```{r}
+
+```
+
+Construisez un modèle de régression linéaire qui explique la variation de la longueur des pétales en fonction de la largeur des pétales **et** de la longueur des tiges.
+
+```{r}
+
+```
+
+Question bonus : peut-on dire que pour les fleurs étudiées, la longueur des pétales dépend de la largeur des pétales et de la longueur des tiges ?
