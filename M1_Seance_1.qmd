@@ -1,0 +1,911 @@
+---
+title: "Séance 1"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+#| include: false
+options(max.print = 100)
+```
+
+# Prise en main
+
+R Studio fonctionne en complément du logiciel de programmation R. RStudio n'est pas à proprement parler une interface graphique qui permettrait d'utiliser R de manière "classique" via la souris, des menus et des boîtes de dialogue. Il s'agit plutôt de ce qu'on appelle un *Environnement de développement intégré* (IDE) qui facilite l'utilisation de R et le développement de scripts.
+
+## Les 4 panneaux de l'interface
+
+### La console et l'invite de commande
+
+L'interface est organisée en quatre grandes zones. La zone en bas à gauche se nomme la *Console*. À son démarrage, RStudio a lancé une nouvelle session de R et c'est dans cette fenêtre que nous allons pouvoir interagir avec lui.
+
+Dans la console, la ligne commençant par le caractère `>` est appelée l'*invite de commande* (ou *prompt* en anglais). Si le curseur y clignote, cela signifie que R est disponible et en attente de votre prochaine instruction. Vous pouvez y taper la commande : `2 + 2` et appuyer sur `Entrée`.
+
+### Précisions concernant la saisie des commandes
+
+Lorsqu'on saisit une commande, les espaces autour des opérateurs n'ont pas d'importance. Les trois commandes suivantes sont donc équivalentes, mais on privilégie en général la deuxième pour des raisons de lisibilité du code.
+
+```         
+10+2
+10 + 2
+10       +       2
+```
+
+Quand vous êtes dans la console, vous pouvez utiliser les flèches vers le haut `↑` et vers le bas `↓` de votre clavier pour naviguer dans l'historique des commandes que vous avez tapées précédemment. Vous pouvez à tout moment modifier la commande affichée, et l'exécuter en appuyant sur `Entrée`.
+
+Enfin, il peut arriver qu'on saisisse une commande de manière incomplète : oubli d'une parenthèse, faute de frappe, etc. Dans ce cas, R remplace l'invite de commande habituel par un signe `+`.
+
+```         
+4 *
++
+```
+
+Cela signifie qu'il "attend la suite". On peut alors soit compléter la commande sur cette nouvelle ligne et appuyer sur `Entrée`, soit, si on est perdu, tout annuler et revenir à l'invite de commandes normal en appuyant sur `Esc` ou `Échap`.
+
+## Les scripts
+
+Nous n'allons pas utiliser R en saisissant des commandes directement dans la console. Les commandes vont être regroupées dans des scripts (de simples fichiers texte), qui vont garder une trace de toutes les opérations effectuées, et ce sont ces scripts, sauvegardés régulièrement, qui seront le "coeur" de notre travail. C'est en rouvrant les scripts et en réexécutant les commandes qu'ils contiennent qu'on pourra "reproduire" le chargement des données, leur traitement, les analyses et leurs résultats.
+
+Le texte que vous lisez se situe dans la zone réservée aux scripts. Pour créer un script, il suffit de sélectionner le menu *File*, puis *New file* et *R script*.
+
+Pour exécuter une commande saisie dans un script, il suffit de positionner le curseur sur la ligne de la commande en question, et de cliquer sur le bouton *Run* dans la barre d'outils juste au-dessus de la zone d'édition du script. On peut aussi utiliser le raccourci clavier `Ctrl + Entrée` (`Cmd + Entrée` sous Mac). On peut enfin sélectionner plusieurs lignes avec la souris ou le clavier et cliquer sur *Run* (ou utiliser le raccourci clavier), et l'ensemble des lignes est exécuté d'un coup.
+
+On peut enregistrer notre script à tout moment dans un fichier avec l'extension `.R`, en cliquant sur l'icône de disquette ou en choissant *File* puis *Save*.
+
+Les scripts des cours ne sont pas dans le format `.R` qui contient uniquement des commandes `R`. Ils sont adaptés au format *Quarto* dont l'extension est `.Qmd`. Ce format permet de combiner du texte et du code en délimitant des blocs de code (*code chunks*). Deux modes d'affichages sont disponibles, l'affichage *source* qui a la même apparence qu'un code `.R` classique, et l'affichage *visual* qui ressemble à un logiciel de traitement de texte classique.
+
+Le format *Quarto* permet aussi d'utiliser d'autres langages que R comme *Latex* ou *Python*. Le rectangle gris ci-dessous correspond à un bloc de code auquel on ajoute l'en-tête `{r}` pour spécifier le langage que *Quarto* devra utiliser. Le code peut être lancé de la même façon qu'un script R (`Ctrl + Entrée`). Vous pouvez aussi cliquer sur le triangle vert en haut à droite pour lancer l'intégralité du bloc de code. Cela évite de devoir sélectionner toutes les lignes qu'on veut lancer ensemble.
+
+```{r}
+2+2
+4+4
+```
+
+Le résultat apparaît par défaut en bas du bloc de code. Il est possible de demander à R d'afficher les résultats dans la console comme dans un script `.R`. Il suffit d'aller dans les paramètres (petite roue crantée dans la partie haute de la zone du script) pour sélectionner "Chunk Output in Console".
+
+## L'environnement et l'espace multifonction
+
+Les deux panneaux latéraux sont l'environnement le navigateur.
+
+-   L'environnement est un espace de stockage temporaire, c'est là où seront stockées les données que vous allez importer dans le logiciel ainsi que les objets que vous allez créer.
+
+-   L'espace multifonction a plusieurs onglets :
+
+    -   L'onglet *Files* est un explorateur de fichiers comme Windows en propose un. En général, on créer un dossier quelque part dans ses documents (ici c'est un cloud donc c'est un dossier en ligne) où seront stocker les scripts, les données et les sorties (graphiques, tableaux) dans des dossiers séparés. Créer un projet Rstudio, qui sera un fichier `.Rprojet`, permettra au logiciel de savoir que vous voulez travailler à partir de ce dossier où vous avez tout centralisé. L'intérêt est de pouvoir travailler sur plusieurs projets en même temps et simplement ouvrir le projet sur lequel vous voulez travailler pour que tout soit déjà prêt.
+
+    -   L'onglet *Plot* permettra d'afficher les graphiques dans le logiciel.
+
+    -   L'onglet *Packages* présente la librairie des packages. Un package, c'est un outil qui ajoute à R comme on aujouterait une extension sur un navigateur. Ils sont généralement développés par la communauté et ils permettent d'importer des fonctions additionnelles à celles implémentées de base dans R.
+
+    -   L'onglet *Help* correspond à la documentation. Il sera indispensable pour utiliser les fonctions de R puisque c'est dans ces aides qu'on sait ce que fait une fonction et comment l'utiliser.
+
+    -   L'onglet *Viewer* complète l'onglet *Plot*, il permet d'afficher des sorties comme des tableaux HTML.
+
+## Objets
+
+### Objets simples
+
+Pour conserver le résultat d'une opération, on peut le stocker dans un *objet* à l'aide de l'opérateur d'assignation `<-`. Cette "flèche" stocke ce qu'il y a à sa droite dans un objet dont le nom est indiqué à sa gauche.
+
+Prenons tout de suite un exemple.
+
+```{r}
+x <- 2
+```
+
+Cette commande peut se lire *"prend la valeur 2 et mets la dans un objet qui s'appelle `x`"*.
+
+Si on exécute une commande comportant juste le nom d'un objet, R affiche son contenu.
+
+```{r}
+x
+```
+
+On voit donc que notre objet `x` contient bien la valeur 2.
+
+On peut évidemment réutiliser cet objet dans d'autres opérations : R le remplacera alors par sa valeur.
+
+```{r}
+x + 4
+```
+
+On peut créer autant d'objets qu'on le souhaite.
+
+```{r}
+x <- 2
+y <- 5
+resultat <- x + y
+resultat
+```
+
+::: callout-warning
+Les noms d'objets peuvent contenir des lettres, des chiffres, les symboles `.` et `_`. Ils ne peuvent pas commencer par un chiffre. Attention, R fait la différence entre minuscules et majuscules dans les noms d'objets, ce qui signifie que `x` et `X` seront deux objets différents, tout comme `resultat` et `Resultat`.
+
+De manière générale, il est préférable d'éviter les majuscules (pour les risques d'erreur) et les caractères accentués (pour des questions d'encodage) dans les noms d'objets.
+
+De même, il faut essayer de trouver un équilibre entre clarté du nom (comprendre à quoi sert l'objet, ce qu'il contient) et sa longueur. Par exemple, on préférera comme nom d'objet `taille_conj1` à `taille_du_conjoint_numero_1` (trop long) ou à `t1` (pas assez explicite).
+:::
+
+Quand on assigne une nouvelle valeur à un objet déjà existant, la valeur précédente est perdue. Les objets n'ont pas de mémoire.
+
+```{r}
+x <- 2
+x <- 5
+x
+```
+
+De la même manière, assigner un objet à un autre ne crée pas de "lien" entre les deux. Cela copie juste la valeur de l'objet de droite dans celui de gauche :
+
+```{r}
+x <- 1
+y <- 3
+x <- y
+x
+## Si on modifie y, cela ne modifie pas x
+y <- 4
+x
+```
+
+On le verra, les objets peuvent contenir tout un tas d'informations. Jusqu'ici on n'a stocké que des nombres, mais ils peuvent aussi contenir des chaînes de caractères (du texte), qu'on délimite avec des guillemets simples ou doubles (`'` ou `"`) :
+
+```{r}
+chien <- "Chihuahua"
+chien
+```
+
+### Vecteurs {#sec-introvecteurs}
+
+Imaginons maintenant qu'on a demandé la taille en centimètres de 5 personnes et qu'on souhaite calculer leur taille moyenne. On pourrait créer autant d'objets que de tailles et faire l'opération mathématique qui va bien :
+
+```{r}
+taille1 <- 156
+taille2 <- 164
+taille3 <- 197
+taille4 <- 147
+taille5 <- 173
+(taille1 + taille2 + taille3 + taille4 + taille5) / 5
+```
+
+Cette manière de faire n'est clairement pas pratique du tout. On va donc plutôt stocker l'ensemble de nos tailles dans un seul objet, de type *vecteur*, avec la syntaxe suivante :
+
+```{r}
+tailles <- c(156, 164, 197, 147, 173)
+```
+
+Si on affiche le contenu de cet objet, on voit qu'il contient bien l'ensemble des tailles saisies.
+
+```{r}
+tailles
+```
+
+Un *vecteur* dans R est un objet qui peut contenir plusieurs informations du même type, potentiellement en très grand nombre.
+
+L'avantage d'un vecteur est que lorsqu'on lui applique une opération, celle-ci s'applique à toutes les valeurs qu'il contient. Ainsi, si on veut la taille en mètres plutôt qu'en centimètres, on peut faire :
+
+```{r}
+tailles_m <- tailles / 100
+tailles_m
+```
+
+Cela fonctionne pour toutes les opérations de base.
+
+```{r}
+tailles + 10
+tailles^2
+```
+
+Imaginons maintenant qu'on a aussi demandé aux cinq mêmes personnes leur poids en kilos. On peut créer un deuxième vecteur :
+
+```{r}
+poids <- c(45, 59, 110, 44, 88)
+```
+
+On peut alors effectuer des calculs utilisant nos deux vecteurs `tailles` et `poids`. On peut par exemple calculer l'indice de masse corporelle (IMC) de chacun de nos enquêtés en divisant leur poids en kilo par leur taille en mètre au carré :
+
+```{r}
+imc <- poids / (tailles / 100) ^ 2
+imc
+```
+
+Un vecteur peut contenir des nombres, mais il peut aussi contenir du texte. Imaginons qu'on a demandé aux 5 mêmes personnes leur niveau de diplôme : on peut regrouper l'information dans un vecteur de *chaînes de caractères*. Une chaîne de caractère contient du texte libre, délimité par des guillemets simples ou doubles.
+
+```{r}
+diplome <- c("CAP", "Bac", "Bac+2", "CAP", "Bac+3")
+diplome
+```
+
+L'opérateur `:`, lui, permet de générer rapidement un vecteur comprenant tous les nombres entre deux valeurs, opération assez courante sous R :
+
+```{r}
+x <- 1:10
+x
+```
+
+Enfin, notons qu'on peut accéder à un élément particulier d'un vecteur en faisant suivre le nom du vecteur de crochets contenant le numéro de l'élément désiré.
+
+```{r}
+diplome[2]
+diplome[1]
+diplome[4]
+```
+
+Cette opération, qui utilise l'opérateur `[]`, permet donc la sélection d'éléments d'un vecteur.
+
+Dernière remarque, si on affiche dans la console un vecteur avec beaucoup d'éléments, ceux-ci seront répartis sur plusieurs lignes. Par exemple, si on a un vecteur de 50 nombres on peut obtenir quelque chose comme :
+
+```         
+ [1] 294 425 339 914 114 896 716 648 915 587 181 926 489
+[14] 848 583 182 662 888 417 133 146 322 400 698 506 944
+[27] 237 324 333 443 487 658 793 288 897 588 697 439 697
+[40] 914 694 126 969 744 927 337 439 226 704 635
+```
+
+On remarque que R ajoute systématiquement un nombre entre crochets au début de chaque ligne : il s'agit en fait de la position du premier élément de la ligne dans le vecteur. Ainsi, le 848 de la deuxième ligne est le 14e élément du vecteur, le 914 de la dernière ligne est le 40e, etc.
+
+## Fonctions
+
+### Principe
+
+Nous savons désormais effectuer des opérations arithmétiques de base sur des nombres et des vecteurs, et stocker des valeurs dans des objets pour pouvoir les réutiliser plus tard.
+
+Pour aller plus loin, nous devons aborder les *fonctions* qui sont, avec les objets, un deuxième concept de base de R. On utilise des fonctions pour effectuer des calculs, obtenir des résultats et accomplir des actions.
+
+Formellement, une fonction a un *nom*, elle prend en entrée entre parenthèses un ou plusieurs *arguments* (ou *paramètres*), et retourne un *résultat*.
+
+Prenons tout de suite un exemple. Si on veut connaître le nombre d'éléments du vecteur `tailles` que nous avons construit précédemment, on peut utiliser la fonction `length`, de cette manière :
+
+```{r}
+length(tailles)
+```
+
+Ici, `length` est le nom de la fonction, on l'appelle en lui passant un argument entre parenthèses (en l'occurrence notre vecteur `tailles`), et elle nous renvoie un résultat, à savoir le nombre d'éléments du vecteur passé en paramètre.
+
+Autre exemple, les fonctions `min` et `max` retournent respectivement les valeurs minimales et maximales d'un vecteur de nombres.
+
+```{r}
+min(tailles)
+max(tailles)
+```
+
+La fonction `mean` calcule et retourne la moyenne d'un vecteur de nombres.
+
+```{r}
+mean(tailles)
+```
+
+La fonction `sum` retourne la somme de tous les éléments du vecteur.
+
+```{r}
+sum(tailles)
+```
+
+Jusqu'à présent on n'a vu que des fonctions qui calculent et retournent un unique nombre. Mais une fonction peut renvoyer d'autres types de résultats. Par exemple, la fonction `range` (étendue) renvoie un vecteur de deux nombres, le minimum et le maximum.
+
+```{r}
+range(tailles)
+```
+
+Ou encore, la fonction `unique`, qui supprime toutes les valeurs en double dans un vecteur, qu'il s'agisse de nombres ou de chaînes de caractères.
+
+```{r}
+diplome <- c("CAP", "Bac", "Bac+2", "CAP", "Bac+3")
+unique(diplome)
+```
+
+### Arguments
+
+Une fonction peut prendre plusieurs arguments, dans ce cas on les indique entre parenthèses en les séparant par des virgules.
+
+On a déjà rencontré un exemple de fonction acceptant plusieurs arguments : la fonction `c`, qui combine l'ensemble de ses arguments en un vecteur[^1].
+
+[^1]: `c` est l'abbréviation de *combine*, son nom est très court car on l'utilise très souvent
+
+```{r}
+tailles <- c(156, 164, 197, 181, 173)
+```
+
+Ici, `c` est appelée en lui passant cinq arguments, les cinq tailles séparées par des virgules, et elle renvoie un vecteur numérique regroupant ces cinq valeurs.
+
+Supposons maintenant que dans notre vecteur `tailles` nous avons une valeur manquante (une personne a refusé de répondre, ou notre mètre mesureur était en panne). On symbolise celle-ci dans R avec le code interne `NA`.
+
+```{r}
+tailles <- c(156, 164, 197, NA, 173)
+tailles
+```
+
+::: callout-note
+`NA` est l'abbréviation de *Not available*, non disponible. Cette valeur particulière peut être utilisée pour indiquer une valeur manquante, qu'il s'agisse d'un nombre, d'une chaîne de caractères, etc.
+:::
+
+Si on calcule maintenant la taille moyenne à l'aide de la fonction `mean`, on obtient :
+
+```{r}
+mean(tailles)
+```
+
+En effet, R considère par défaut qu'il ne peut pas calculer la moyenne si une des valeurs n'est pas disponible. Dans ce cas il considère que la moyenne est elle-même "non disponible" et renvoie donc `NA` comme résultat.
+
+On peut cependant indiquer à `mean` d'effectuer le calcul en ignorant les valeurs manquantes. Ceci se fait en ajoutant un argument supplémentaire, nommé `na.rm` (abbréviation de *NA remove*, "enlever les NA"), et de lui attribuer la valeur `TRUE` (code interne de R signifiant *vrai*).
+
+```{r}
+mean(x = tailles, na.rm = TRUE)
+```
+
+Positionner le paramètre `na.rm` à `TRUE` indique à la fonction `mean` de ne pas tenir compte des valeurs manquantes dans le calcul.
+
+Si on ne dit rien à la fonction `mean`, cet argument a une valeur par défaut, en l'occurrence `FALSE` (faux), qui fait qu'il ne supprime pas les valeurs manquantes. Les deux commandes suivantes sont donc rigoureusement équivalentes :
+
+```{r}
+mean(tailles)
+mean(tailles, na.rm = FALSE)
+```
+
+::: callout-note
+Lorsqu'on passe un argument à une fonction de cette manière, c'est-à-dire sous la forme `nom = valeur`, on parle d'*argument nommé*.
+:::
+
+Les arguments permettent donc de spécifier le fonctionnement des fonctions. Pour obtenir les quantiles autres que la médiane, on peut utiliser la fonction `quantile` et préciser la probabilité qui nous intéresse :
+
+```{r}
+tailles <- c(156, 178, 190, 203, 155, 157, 160, 180, 175, 164, 186, 190, 172)
+# Deux façons équivalentes d'obtenir la médiane
+median(tailles)
+quantile(x = tailles, probs = 0.5)
+
+# Le premier quartile
+quantile(x = tailles, probs = 0.25)
+# Le troisième quartile
+quantile(x = tailles, probs = 0.75)
+# Les premier et troisième quartiles en même temps
+quantile(x = tailles, probs = c(0.25, 0.75))
+
+# Le premier et le neuvième déciles
+quantile(x = tailles, probs = c(0.1, 0.9))
+```
+
+### Aide sur une fonction
+
+Il est fréquent de ne pas savoir (ou d'avoir oublié) quels sont les arguments d'une fonction, ou comment ils se nomment. On peut à tout moment faire appel à l'aide intégrée à R en passant le nom de la fonction (entre guillemets) à la fonction `help` ou en appuyant sur la touche `F1`.
+
+```{r, eval = FALSE}
+help("mean")
+```
+
+On peut aussi utiliser le raccourci `?mean`.
+
+Ces deux commandes affichent une page (en anglais) décrivant la fonction, ses paramètres, son résultat, le tout accompagné de diverses notes, références et exemples. Ces pages d'aide contiennent à peu près tout ce que vous pourrez chercher à savoir, mais elles ne sont pas toujours d'une lecture aisée.
+
+Dans RStudio, les pages d'aide en ligne s'ouvriront par défaut dans la zone en bas à droite, sous l'onglet *Help*. Un clic sur l'icône en forme de maison vous affichera la page d'accueil de l'aide.
+
+```{r, eval=FALSE}
+tailles <- c(156, 164, 197, 147, 173)
+poids <- c(45, 59, 110, 44, 88)
+
+mean(tailles)
+mean(poids)
+
+imc <- poids / (tailles / 100) ^ 2
+min(imc)
+max(imc)
+```
+
+### Commentaires
+
+Les commentaires sont un élément très important d'un script. Il s'agit de texte libre, ignoré par R, et qui permet de décrire les étapes du script, sa logique, les raisons pour lesquelles on a procédé de telle ou telle manière... Il est primordial de documenter ses scripts à l'aide de commentaires, car il est très facile de ne plus se retrouver dans un programme qu'on a produit soi-même, même après une courte interruption.
+
+Pour ajouter un commentaire, il suffit de le faire précéder d'un ou plusieurs symboles `#`. En effet, dès que R rencontre ce caractère, il ignore tout ce qui se trouve derrière, jusqu'à la fin de la ligne.
+
+On peut donc documenter le script précédent :
+
+```{r, eval=FALSE}
+# Saisie des tailles et poids des enquêtés
+tailles <- c(156, 164, 197, 147, 173)
+poids <- c(45, 59, 110, 44, 88)
+
+# Calcul des tailles et poids moyens
+mean(tailles)
+mean(poids)
+
+# Calcul de l'IMC (poids en kilo divisé par les tailles en mètre au carré)
+imc <- poids / (tailles / 100) ^ 2
+# Valeurs extrêmes de l'IMC
+min(imc)
+max(imc)
+```
+
+## Installer et charger des extensions (*packages*) {#sec-packages}
+
+R étant un logiciel libre, il bénéficie d'un développement communautaire riche et dynamique. L'installation de base de R permet de faire énormément de choses, mais le langage dispose en plus d'un système d'extensions permettant d'ajouter facilement de nouvelles fonctionnalités. La plupart des extensions sont développées et maintenues par la communauté des utilisateurs et utilisatrices de R, et diffusées via un réseau de serveurs nommé [CRAN](https://cran.r-project.org/) (*Comprehensive R Archive Network*).
+
+Pour installer une extension, si on dispose d'une connexion Internet, on peut utiliser le bouton *Install* de l'onglet *Packages* de RStudio. Il suffit alors d'indiquer le nom de l'extension dans le champ *Package* et de cliquer sur *Install*.
+
+On peut aussi installer des extensions en utilisant la fonction `install.packages()` directement dans la console. Par exemple, pour installer le *package* `questionr` on peut exécuter la commande :
+
+```{r, eval = FALSE}
+install.packages("questionr")
+```
+
+Installer une extension via l'une des deux méthodes précédentes va télécharger l'ensemble des fichiers nécessaires depuis l'une des machines du CRAN, puis installer tout ça sur le disque dur de votre ordinateur. Vous n'avez besoin de le faire qu'une fois, comme vous le faites pour installer un programme sur votre Mac ou PC.
+
+Une fois l'extension installée, il faut la "charger" avant de pouvoir utiliser les fonctions qu'elle propose. Ceci se fait avec la fonction `library`. Par exemple, pour pouvoir utiliser les fonctions de `questionr`, vous devrez exécuter la commande suivante :
+
+```{r eval = FALSE}
+library(questionr)
+```
+
+Ainsi, on regroupe en général en début de script toute une série d'appels à `library` qui permettent de charger tous les packages utilisés dans le script. Quelque chose comme :
+
+```{r eval = FALSE}
+library(readxl)
+library(ggplot2)
+library(questionr)
+```
+
+Si vous essayez d'exécuter une fonction d'une extension et que vous obtenez le message d'erreur `impossible de trouver la fonction`, c'est certainement parce que vous n'avez pas exécuté la commande `library` correspondante.
+
+## Exercices
+
+**Exercice 1**
+
+Construire un vecteur `x` qui contient les valeurs 120, 134, 256, 12
+
+```{r}
+
+```
+
+Utiliser ce vecteur `x` pour générer les deux vecteurs `c(220, 234, 356, 112)` et `c(240, 268, 512, 24)`
+
+```{r}
+x + 100
+x * 2
+```
+
+**Exercice 2**
+
+On a demandé à 4 ménages le revenu des deux conjoints, et le nombre de personnes du ménage :
+
+```{r}
+# Données
+conjoint1 <- c(1200, 1180, 1750, 2100)
+conjoint2 <- c(1450, 1870, 1690, 0)
+nb_personnes <- c(4, 2, 3, 2)
+```
+
+Calculer le revenu total de chaque ménage, puis diviser par le nombre de personnes pour obtenir le revenu par personne de chaque ménage.
+
+```{r}
+# Réponse
+
+```
+
+**Exercice 3**
+
+Dans l'exercice précédent, calculer le revenu minimum et maximum parmi ceux du premier conjoint.
+
+```{r}
+# Données
+conjoint1 <- c(1200, 1180, 1750, 2100)
+
+# Réponse
+
+```
+
+Recommencer avec les revenus suivants, parmi lesquels l'un des enquetés n'a pas voulu répondre :
+
+```{r}
+# Données
+conjoint1 <- c(1200, 1180, 1750, NA)
+
+# Réponse
+
+```
+
+**Exercice 4**
+
+Les deux vecteurs suivants représentent les précipitations (en mm) et la température (en °C) moyennes pour chaque mois de l'année pour la ville de Lyon (moyennes calculées sur la période 1981-2010) :
+
+```{r}
+# Données
+temperature <- c(3.4, 4.8, 8.4, 11.4, 15.8, 19.4, 22.2, 21.6, 17.6, 13.4, 7.6, 4.4)
+precipitations <- c(47.2, 44.1, 50.4, 74.9, 90.8, 75.6, 63.7, 62, 87.5, 98.6, 81.9, 55.2)
+```
+
+Calculer la température moyenne sur l'année.
+
+```{r}
+# Réponse
+
+```
+
+Calculer la quantité totale de précipitations sur l'année.
+
+```{r}
+# Réponse
+
+```
+
+À quoi correspond et comment peut-on interpréter le résultat de la fonction suivante ? Vous pouvez vous aider de la page d'aide de la fonction si nécessaire.
+
+```{r}
+cumsum(precipitations) 
+```
+
+Même question pour :
+
+```{r}
+diff(temperature)
+```
+
+# Jeu de données d'exemple
+
+Dans cette partie nous allons utiliser un jeu de données présent dans l'extension `questionr`. L'extension est déjà installée sur le service R Studio du SSP Cloud, il faudrait autrement l'installer en lançant la commande `install.packages("questionr")` . Pour pouvoir utiliser ces données, il faut d'abord charger l'extension `questionr` (après l'avoir installée, bien entendu) :
+
+```{r}
+library(questionr)
+```
+
+L'utilisation de `library` permet de rendre "disponibles", dans notre session R, les fonctions et jeux de données inclus dans l'extension.
+
+Le jeu de données que nous allons utiliser est un extrait de l'enquête *Histoire de vie* réalisée par l'INSEE en 2003. Il contient 2000 individus et 20 variables. La commande `data` permet d'accéder aux données contenues dans le package. En temps normal et en dehors de cet exemple pédagogique, vous aurez à importer des fichiers stocker sur votre propre ordinateur avec une commande du type `read_csv2("chemin du fichier/fichier.csv")`. l
+
+```{r}
+# Chargement des données
+data(hdv2003)
+```
+
+Un tableau de données apparaît maintenant dans votre environnement. C'est un objet comme l'étaient les vecteurs étudiés plus haut et cet objet est appelé `hdv2003` .
+
+## Tableau de données (*data frame*)
+
+Un *data frame* (ou tableau de données, ou table) est un type d'objet R qui contient des données au format tabulaire, avec les observations en ligne et les variables en colonnes, comme dans une feuille de tableur de type LibreOffice ou Excel.
+
+Si on se contente d'exécuter le nom de notre tableau de données R va, comme à son habitude, nous l'afficher dans la console (ou sous le bloc de code si vous n'avez pas modifié la zone de sortie).
+
+```{r}
+hdv2003
+```
+
+Une autre manière d'afficher le contenu du tableau est de cliquer sur le nom de l'objet dans l'onglet *Environment*, ou d'utiliser la fonction `View` :
+
+```{r}
+#| eval: false
+View(hdv2003)
+```
+
+Il est important de comprendre que l'objet `hdv2003` contient *l'intégralité* des données du tableau. On voit donc qu'un objet peut contenir des données de types très différents (simple nombre, texte, vecteur, tableau de données entier), et être potentiellement de très grande taille[^2].
+
+[^2]: La seule limite pour la taille d'un objet étant la mémoire vive (RAM) de la machine sur laquelle tourne la session R.
+
+Un *data frame* peut être manipulé comme les autres objets vus précédemment. On peut par exemple faire :
+
+```{r}
+d <- hdv2003
+```
+
+ce qui va entraîner la copie de l'ensemble de nos données dans un nouvel objet nommé `d`. Ceci peut paraître parfaitement inutile mais a en fait l'avantage de fournir un objet avec un nom beaucoup plus court, ce qui diminuera la quantité de texte à saisir par la suite.
+
+### Structure du tableau
+
+Un tableau étant un objet comme un autre, on peut lui appliquer des fonctions. Par exemple, `nrow` et `ncol` retournent le nombre de lignes et de colonnes du tableau.
+
+```{r}
+nrow(d)
+```
+
+```{r}
+ncol(d)
+```
+
+La fonction `dim` renvoie ses dimensions, donc les deux nombres précédents.
+
+```{r}
+dim(d)
+```
+
+On peut ainsi accéder à certaines lignes et colonnes du tableau en utilisant les index et l'opérateur `[]`, précédemment utilisé pour les vecteurs. La seule différence est qu'on donne ici 2 index plutôt qu'1 dans le cas des vecteurs : la ligne, puis la colonne, séparées par une virgule.
+
+```{r}
+# La case correspondant à la première ligne et la première colonne
+d[1, 1]
+# Toute la première ligne
+d[1,]
+# Toute la première colonne
+d[,1]
+# Les lignes de 1 à 10 et les colonnes de 2 et 3
+d[1:10, c(2,3)]
+```
+
+La fonction `names` retourne les noms des colonnes du tableau, c'est-à-dire la liste de nos *variables*.
+
+```{r}
+names(d)
+```
+
+Enfin, la fonction `str` renvoie un descriptif plus détaillé de la structure du tableau. Elle liste les différentes variables, indique leur type et affiche les premières valeurs.
+
+```{r}
+str(d)
+```
+
+### Accéder aux variables d'un tableau
+
+Une opération très importante est l'accès aux variables du tableau (à ses colonnes) pour pouvoir les manipuler, effectuer des calculs, etc. On utilise pour cela l'opérateur `$`, qui permet d'accéder aux colonnes du tableau. Ainsi, si l'on tape :
+
+```{r}
+d$sexe
+```
+
+R va afficher l'ensemble des valeurs de la variable `sexe` dans la console, ce qui est à nouveau fort peu utile. Mais cela nous permet de constater que `d$sexe` est un vecteur de chaînes de caractères tels qu'on en a déjà rencontré précédemment.
+
+La fonction `table$colonne` renvoie donc la colonne nommée `colonne` du tableau `table`, c'est-à-dire un vecteur, en général de nombres ou de chaînes de caractères.
+
+Si on souhaite afficher seulement les premières ou dernières valeurs d'une variable, on peut utiliser les fonctions `head` et `tail`.
+
+```{r}
+head(d$age)
+```
+
+```{r}
+tail(d$age)
+```
+
+Le deuxième argument numérique permet d'indiquer le nombre de valeurs à afficher.
+
+### Créer une nouvelle variable
+
+On peut aussi utiliser l'opérateur `$` pour créer une nouvelle variable dans notre tableau : pour cela, il suffit de lui assigner une valeur.
+
+Par exemple, la variable `heures.tv` contient le nombre d'heures passées quotidiennement devant la télé.
+
+```{r}
+head(d$heures.tv)
+```
+
+On peut vouloir créer une nouvelle variable dans notre tableau qui contienne la même durée convertie en minutes. On va donc créer une nouvelle variables `minutes.tv` de la manière suivante :
+
+```{r}
+d$minutes.tv <- d$heures.tv * 60
+```
+
+On peut alors constater, soit visuellement soit dans la console, qu'une nouvelle variable (une nouvelle colonne) a bien été ajoutée au tableau.
+
+```{r}
+head(d$minutes.tv)
+```
+
+# Applications
+
+## L'âge au décès
+
+On charge ici deux tableaux de données, `deces_f` pour les femmes et `deces_h` pour les hommes, tirés du fichier des personnes décédées en France en 2019.
+
+```{r}
+# Chargement du tableau de données
+dec_f <- aws.s3::s3read_using(FUN = data.table::fread,
+                           object = "/diffusion/deces_f.csv",
+                           bucket = "aubinpoissonnier",
+                           opts = list("region" = ""))
+dec_h <- aws.s3::s3read_using(FUN = data.table::fread,
+                           object = "/diffusion/deces_h.csv",
+                           bucket = "aubinpoissonnier",
+                           opts = list("region" = ""))
+```
+
+### Exploration du tableau de données
+
+La plupart du temps, l'analyse quantitative porte sur des données de seconde main dont on ne contrôle pas la forme. Il est important de savoir comment prendre connaissance de l'organisation des données car c'est cette organisation qui va déterminer les étapes à réaliser pour produire des statistiques ou des représentations graphiques.
+
+```{r}
+# Visualisez les deux tableaux de données
+
+# Affichez leurs dimensions
+
+# Affichez le nom de leurs colonnes
+
+
+# Affichez leur structure
+
+
+# Accédez à la colonne date de décès
+
+
+
+```
+
+### Calcul des indicateurs
+
+#### Transformer des données administratives
+
+Le tableau suit une structure simple : une ligne par personne décédée. En réalité le tableau a déjà été modifié car il a fallu calculer l'âge au décès en faisant l'écart entre les dates de naissance et de décès renseignées. Deux problèmes se sont posés.
+
+Un premier problème émerge quand on utilise la fonction `class` qui permet de connaître la nature d'un objet, par exemple la nature de nos colonnes comme l'affichait déjà la fonction `str` :
+
+```{r}
+# La nature de chaque colonne du tableau
+str(dec_f)
+# La nature des colonnes des dates
+class(dec_f$datenaiss)
+class(dec_f$datedeces)
+# La colonne en elle-même
+dec_f$datenaiss
+```
+
+On voit que `datenaiss` et `datedeces` sont des colonnes qui contiennent du texte : la date sous format "AAAA-MM-JJ". Calculer l'âge suppose de faire une différence temporelle à partir d'une information codée comme du texte, ce qui peut impliquer de :
+
+-   Arrondir en ne gardant que les 4 premiers caractères, soit l'année, puis transformer cette nouvelle colonne en un vecteur numérique
+
+-   Transformer cette colonne en objet date, géré par R, pour qu'il réalise lui-même le calcul de la différence temporelle
+
+Un deuxième problème érmege quand on utilise la fonction `is.na()` qui permet de tester si une valeur est codée comme `NA` pour *not available*, soit comme valeur manquante.
+
+```{r}
+# On applique la fonction is.na aux dates
+is.na(dec_f$datedeces)
+is.na(dec_f$datenaiss)
+```
+
+On obtient un résultat d'un nouveau genre, de nature logique : soit `FALSE` pour faux, soit `TRUE` pour vrai. Ainsi, tous les éléments pour lesquels le résultat du test est vrai correspondent à des valeurs manquantes.
+
+Comme la fonction applique le test pour chaque élément du vecteur (chaque ligne de la colonne du tableau étudiée ici), on obtient un vecteur de la même longueur que la colonne initiale.
+
+```{r}
+# Longueur de la colonne (= qui est un vecteur rangé dans un tableau de données)
+length(dec_f$datenaiss)
+# Longueur du test is.na appliqué à la colonne
+length(is.na(dec_f$datenaiss))
+```
+
+Une façon de compter le nombre de valeurs manquantes consiste à compter le nombre de `TRUE`, qui sur un plan informatique valent 1, en faisant la somme du vecteur :
+
+```{r}
+# On fait la somme des éléments du vecteur, ce qui permet de compter le nombre de valeurs manquantes
+sum(is.na(dec_f$datenaiss))
+sum(is.na(dec_f$datedeces))
+sum(is.na(dec_f$age))
+```
+
+On remarque que les 1688 valeurs manquantes pour l'âge du décès chez les femmes correspond à 1681 femmes dont on ne connaît pas la date de naissance plus 7 autres femmes dont on ne connaît pas la date de décès.
+
+```{r}
+# Comparaison du nombre de valeurs manquantes entre les variables initiales des dates et la variable recodée de l'âge au décès
+sum(is.na(dec_f$datenaiss)) + sum(is.na(dec_f$datedeces))
+sum(is.na(dec_f$age))
+```
+
+#### Réalisation des calculs avec les fonctions de base
+
+Calculez la moyenne, la moyenne, les premier et troisième quartiles et finalement les premier et neuvième déciles de l'âge au décès chez les femmes et chez les hommes.
+
+```{r}
+# La moyenne d'âge au décès
+
+
+# La médiane d'âge au décès
+
+
+# Les quartiles
+
+
+# Les déciles extrêmes
+
+
+```
+
+## L'espérance de vie
+
+On charge maintenant les tables de mortalité de 2019 fournies par l'INSEE. C'est elles qui nous permettront de calculer l'espérance de vie.
+
+```{r}
+# Chargement des données
+mort <- aws.s3::s3read_using(FUN = data.table::fread,
+                           object = "/diffusion/tab_mort19.csv",
+                           bucket = "aubinpoissonnier",
+                           opts = list("region" = ""))
+```
+
+### Exploration du tableau
+
+Explorez le tableau de données et tentez de comprendre à quoi correspondent les colonnes en vous rappelant le protocole de calcul de l'espérance de vie.
+
+```{r}
+# Visualiser
+View(mort)
+
+# La structure
+str(mort)
+```
+
+Réfléchissez maintenant aux étapes qu'il faudrait suivre pour aboutir au calcul de l'espérance de vie à la naissance chez les hommes et chez les femmes.
+
+### Calculs
+
+```{r}
+## Calcul de la moyenne d'âge au décès de la génération fictive
+# Première étape de la moyenne d'âge pondérée
+# Multiplier chaque âge par le nombre de personnes décédées à cet âge
+
+
+
+# Deuxième étape, faire la somme des âges pondérés et diviser par le total d'individu
+# Chez les femmes
+
+
+# Chez les hommes
+
+# Arrondis
+# En explicitant le deuxième argument
+
+# En donnant le deuxième argument implicitement
+
+# En utilisant la valeur par défaut
+
+```
+
+Comparez la valeur de l'indicateur de l'espérance de vie par rapport à la valeur de l'âge moyen au décès
+
+```{r}
+# Chez les femmes
+
+
+# Chez les hommes
+
+```
+
+Calculez l'espérance de vie à 40 ans chez les hommes et chez les femmes.
+
+```{r}
+# On sélectionne les lignes à partir de 40 ans
+dim(mort)
+# Soit de la 41eme ligne à la dernière, la 105ème
+mort40 <- mort[41:105,]
+
+# Et on refait les mêmes calculs, en repartant d'un âge 0
+mort40$age <- mort40$age - 40
+
+# Première étape de la moyenne d'âge pondérée
+# Multiplier chaque âge par le nombre de personnes décédées à cet âge
+mort40$age_p_fem <- mort40$age*mort40$dec_fem
+mort40$age_p_hom <- mort40$age*mort40$dec_hom
+
+
+# Deuxième étape, faire la somme des âges pondérés et diviser par le total d'individu
+# Chez les femmes
+esp_fem <- sum(mort40$age_p_fem)/sum(mort40$dec_fem)
+
+# Chez les hommes
+esp_hom <- sum(mort40$age_p_hom)/sum(mort40$dec_hom)
+
+# Arrondis
+# En explicitant le deuxième argument
+esp_femr1 <- round(esp_fem, digits = 2)
+esp_femr1
+# En donnant le deuxième argument implicitement
+esp_femr2 <- round(esp_fem, 2)
+esp_femr2
+# En utilisant la valeur par défaut
+esp_femr3 <- round(esp_fem)
+esp_femr3
+```
+
+Calculez maintenant l'espérance de vie à la naissance sans distinguer selon le sexe.
+
+```{r}
+## Calcul de la moyenne d'âge au décès de la génération fictive
+# Regrouper les hommes et les femmes
+
+# Première étape de la moyenne d'âge pondérée
+# Multiplier chaque âge par le nombre de personnes décédées à cet âge
+
+
+# Deuxième étape, faire la somme des âges pondérés et diviser par le total d'individu
+
+
+# Arrondis
+# En explicitant le deuxième argument
+
+# En donnant le deuxième argument implicitement
+
+# En utilisant la valeur par défaut
+
+```
