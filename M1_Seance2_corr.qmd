@@ -1,0 +1,127 @@
+---
+title: "Séance 2"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+#| include: false
+library(questionr)
+library(tidyverse)
+data("hdv2003")
+rp <- aws.s3::s3read_using(FUN = data.table::fread,
+                           object = "/diffusion/RP/rplyon_2017.csv",
+                           bucket = "aubinpoissonnier",
+                           opts = list("region" = ""))
+```
+
+Vous travaillez ici avec les données du recensement anonymisées, publiées sous forme d'un fichier comportant une ligne par individu. La base `rp` correspond au recensement de 2017 pour la ville de Lyon. Le dictionnaire des codes est disponible à [cette adresse](https://www.insee.fr/fr/statistiques/4802064?sommaire=4508161#dictionnaire).
+
+# Tests logiques
+
+L'essentiel du recodage s'opère avec des instructions logiques simples (égal, différent, inférieur ou supérieur à) que l'on peut combiner sur une variable ou plusieurs variables). On utilise pour cela des tests.
+
+Un test est une opération logique de comparaison qui renvoie vrai (`TRUE`) ou faux (`FALSE`) pour chacun des éléments d'un vecteur.
+
+Parmi les opérateurs de comparaison disponibles, on trouve notamment :
+
+-   `==` qui teste l'égalité
+-   `!=` qui teste la différence
+-   `>`, `<`, `<=`, `>=` qui testent la supériorité ou l'infériorité
+-   `%in%` qui teste l'appartenance à un ensemble de valeurs
+
+Exemple le plus simple :
+
+```{r}
+2 == 3
+```
+
+```{r}
+2 != 3
+```
+
+Exemple appliqué à un vecteur :
+
+```{r}
+x <- 1:10
+x < 5
+```
+
+On peut combiner plusieurs tests avec les opérateurs logiques *et* (`&`) et *ou* (`|`). Ainsi, si on veut tester qu'une valeur est comprise entre 3 et 6 inclus, on peut faire :
+
+```{r}
+x >= 3 & x <= 6
+```
+
+Si on veut tester qu'une valeur est égale à "Bleu" ou à "Vert", on peut faire :
+
+```{r}
+vec <- c("Jaune", "Jaune", "Rouge", "Vert")
+vec == "Jaune" | vec == "Vert"
+```
+
+À noter que dans ce cas, on peut utiliser l'opérateur `%in%`[^1], qui teste si une valeur fait partie des éléments d'un vecteur :
+
+[^1]: Pour accéder à la page de documentation de fonctions comme `%in%`, on ne peut pas utiliser `?%in%`, qui renvoie une erreur. Vous pouvez faire `?"%in%"`, `help("%in%")` ou, dans ce cas, `?match`, car les deux fonctions sont documentées sur la même page d'aide.
+
+```{r}
+vec %in% c("Jaune", "Vert")
+```
+
+::: callout-warning
+Attention, si on souhaite tester si une valeur `x` est inconnue (ou 'manquante'), c'est-à-dire si elle est codée `NA` (*Not Available*), faire le test `x == NA` *ne donnera pas le résultat escompté*. En effet, fidèle à sa réputation de rigueur informaticienne, pour R `NA == NA` ne vaut pas `TRUE` mais... `NA` (on ne sait pas si une valeur inconnue est égale à une autre valeur inconnue).
+
+Pour tester si une valeur est inconnue (`NA`), il faut utiliser la fonction dédiée `is.na` et faire `is.na(x)`.
+
+Cependant, par convention, `NA %in% NA` vaut `TRUE`.
+:::
+
+Enfin, on peut inverser un test avec l'opérateur *non* (`!`) :
+
+```{r}
+!(vec %in% c("Jaune", "Vert"))
+```
+
+## Exercices
+
+Appliquez un test sur les habitant·es de Lyon qui vérifie si ils et elles sont :
+
+1.  Immigré·es
+2.  Immigré·es et majeur·es
+3.  Immgré·es marié·es ou pacsé·es
+4.  Immigré·es français·es marié·es ou pacsé
+5.  Immigré·es français marié·es ou immigré·es étranger·es pacsé·es
+6.  Immigré·es pas propriétaires
+
+```{r}
+# 1
+rp$immi == 1
+
+# 2
+rp$immi == 1 & 
+  rp$agerev > 17
+
+# 3 
+rp$immi == 1 &
+  rp$stat_conj %in% 1:2
+
+# 4
+rp$immi == 1 &
+  rp$stat_conj %in% 1:2 &
+  rp$inatc == 1
+
+# 5
+(rp$immi == 1 &
+  rp$stat_conj == 1 &
+    rp$inatc == 1) |
+  (rp$immi == 1 &
+  rp$stat_conj == 2 &
+  rp$inatc == 2)
+
+# 6
+rp$immi == 1 &
+  rp$stocd != 10
+```
+
