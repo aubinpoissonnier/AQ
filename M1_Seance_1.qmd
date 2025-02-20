@@ -457,8 +457,7 @@ Construire un vecteur `x` qui contient les valeurs 120, 134, 256, 12
 Utiliser ce vecteur `x` pour générer les deux vecteurs `c(220, 234, 356, 112)` et `c(240, 268, 512, 24)`
 
 ```{r}
-x + 100
-x * 2
+
 ```
 
 **Exercice 2**
@@ -709,8 +708,6 @@ La plupart du temps, l'analyse quantitative porte sur des données de seconde ma
 
 # Accédez à la colonne date de décès
 
-
-
 ```
 
 ### Calcul des indicateurs
@@ -856,36 +853,19 @@ Calculez l'espérance de vie à 40 ans chez les hommes et chez les femmes.
 
 ```{r}
 # On sélectionne les lignes à partir de 40 ans
-dim(mort)
 # Soit de la 41eme ligne à la dernière, la 105ème
-mort40 <- mort[41:105,]
+
 
 # Et on refait les mêmes calculs, en repartant d'un âge 0
-mort40$age <- mort40$age - 40
 
 # Première étape de la moyenne d'âge pondérée
 # Multiplier chaque âge par le nombre de personnes décédées à cet âge
-mort40$age_p_fem <- mort40$age*mort40$dec_fem
-mort40$age_p_hom <- mort40$age*mort40$dec_hom
-
 
 # Deuxième étape, faire la somme des âges pondérés et diviser par le total d'individu
 # Chez les femmes
-esp_fem <- sum(mort40$age_p_fem)/sum(mort40$dec_fem)
 
 # Chez les hommes
-esp_hom <- sum(mort40$age_p_hom)/sum(mort40$dec_hom)
 
-# Arrondis
-# En explicitant le deuxième argument
-esp_femr1 <- round(esp_fem, digits = 2)
-esp_femr1
-# En donnant le deuxième argument implicitement
-esp_femr2 <- round(esp_fem, 2)
-esp_femr2
-# En utilisant la valeur par défaut
-esp_femr3 <- round(esp_fem)
-esp_femr3
 ```
 
 Calculez maintenant l'espérance de vie à la naissance sans distinguer selon le sexe.
@@ -899,13 +879,5 @@ Calculez maintenant l'espérance de vie à la naissance sans distinguer selon le
 
 
 # Deuxième étape, faire la somme des âges pondérés et diviser par le total d'individu
-
-
-# Arrondis
-# En explicitant le deuxième argument
-
-# En donnant le deuxième argument implicitement
-
-# En utilisant la valeur par défaut
 
 ```

@@ -6,22 +6,10 @@ editor_options:
   chunk_output_type: console
 ---
 
-```{r}
-#| include: false
-library(questionr)
-library(tidyverse)
-data("hdv2003")
-rp <- aws.s3::s3read_using(FUN = data.table::fread,
-                           object = "/diffusion/RP/rplyon_2017.csv",
-                           bucket = "aubinpoissonnier",
-                           opts = list("region" = ""))
-```
-
-Vous travaillez ici avec les données du recensement anonymisées, publiées sous forme d'un fichier comportant une ligne par individu. La base `rp` correspond au recensement de 2017 pour la ville de Lyon. Le dictionnaire des codes est disponible à [cette adresse](https://www.insee.fr/fr/statistiques/4802064?sommaire=4508161#dictionnaire).
-
-# Tests logiques
-
-L'essentiel du recodage s'opère avec des instructions logiques simples (égal, différent, inférieur ou supérieur à) que l'on peut combiner sur une variable ou plusieurs variables). On utilise pour cela des tests.
+# Coder et recoder
+## Les tests logiques
+### Principe
+L'essentiel du codage et du recodage s'opère avec des instructions logiques simples (égal, différent, inférieur ou supérieur à) que l'on peut combiner sur une variable ou plusieurs variables). On utilise pour cela des tests.
 
 Un test est une opération logique de comparaison qui renvoie vrai (`TRUE`) ou faux (`FALSE`) pour chacun des éléments d'un vecteur.
 
@@ -62,6 +50,7 @@ vec <- c("Jaune", "Jaune", "Rouge", "Vert")
 vec == "Jaune" | vec == "Vert"
 ```
 
+### L'opérateur %in%
 À noter que dans ce cas, on peut utiliser l'opérateur `%in%`[^1], qui teste si une valeur fait partie des éléments d'un vecteur :
 
 [^1]: Pour accéder à la page de documentation de fonctions comme `%in%`, on ne peut pas utiliser `?%in%`, qui renvoie une erreur. Vous pouvez faire `?"%in%"`, `help("%in%")` ou, dans ce cas, `?match`, car les deux fonctions sont documentées sur la même page d'aide.
@@ -70,6 +59,8 @@ vec == "Jaune" | vec == "Vert"
 vec %in% c("Jaune", "Vert")
 ```
 
+
+### Le cas des NA
 ::: callout-warning
 Attention, si on souhaite tester si une valeur `x` est inconnue (ou 'manquante'), c'est-à-dire si elle est codée `NA` (*Not Available*), faire le test `x == NA` *ne donnera pas le résultat escompté*. En effet, fidèle à sa réputation de rigueur informaticienne, pour R `NA == NA` ne vaut pas `TRUE` mais... `NA` (on ne sait pas si une valeur inconnue est égale à une autre valeur inconnue).
 
@@ -84,7 +75,21 @@ Enfin, on peut inverser un test avec l'opérateur *non* (`!`) :
 !(vec %in% c("Jaune", "Vert"))
 ```
 
-## Exercices
+
+### Exercices
+
+```{r}
+#| include: false
+library(questionr)
+library(tidyverse)
+data("hdv2003")
+rp <- aws.s3::s3read_using(FUN = data.table::fread,
+                           object = "/diffusion/RP/rplyon_2017.csv",
+                           bucket = "aubinpoissonnier",
+                           opts = list("region" = ""))
+```
+
+Vous travaillez ici avec les données du recensement anonymisées, publiées sous forme d'un fichier comportant une ligne par individu. La base `rp` correspond au recensement de 2017 pour la ville de Lyon. Le dictionnaire des codes est disponible à [cette adresse](https://www.insee.fr/fr/statistiques/4802064?sommaire=4508161#dictionnaire).
 
 Appliquez un test sur les habitant·es de Lyon qui vérifie si ils et elles sont :
 
@@ -125,3 +130,4 @@ rp$immi == 1 &
   rp$stocd != 10
 ```
 
+## Le codage
