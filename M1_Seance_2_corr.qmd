@@ -6,9 +6,76 @@ editor_options:
   chunk_output_type: console
 ---
 
-# Coder et recoder
+# Manipuler les données
+## La nature des variables et les classes de vecteur 
+
+Chaque vecteur a une classe liée à la nature des éléments qu'il contient et la façon dont ces éléments sont traités. C'est la fonction `class` qui permet de connaître la classe d'un vecteur.
+
+### Le texte
+
+Un vecteur contenant du texte prend par défaut la classe `character`.
+```{r}
+mots <- c("maison", "chien", "bâteau")
+class(mots)
+```
+
+Pour que ce texte soit considéré comme des étiquettes (= les modalités d'une variable qualitative), il faut le transformer en `factor` avec la fonction `as.factor`. 
+
+```{r}
+mots <- c("maison", "chien", "bâteau")
+class(mots)
+
+mots <- as.factor(c("maison", "chien", "bâteau"))
+class(mots)
+```
+
+Le vecteur a maintenant des modalités, appelées `levels`. Il peut être retransformé en `character` avec la fonction `as.character`.
+
+```{r}
+levels(mots)
+
+mots <- as.character(mots)
+levels(mots)
+```
+
+### Les chiffres
+
+Les vecteurs contenant du chiffre prennent par défaut la classe d'`numeric`.  
+```{r}
+x <- c(1, 2, 5, 6)
+class(x)
+```
+
+Des chiffres peuvent cepender être considérés comme du texte ou des étiquettes, notamment si une colonne d'un tableau de donné est codé non numériquement ("01" au lieu de 1) ou si les non réponses sont codées explicitement ("Non réponse" plutôt que NA). La fonction `as.numeric` permet de convertir du character ou du factor en numeric.
+
+```{r}
+x <- c(1, 2, 5, "Non réponse")
+class(x)
+
+x <- c("01", "02", "05", "06")
+class(x)
+x <- as.numeric(x)
+x
+class(x)
+```
+
+Attention néanmoins aux conversions automatiques, elles peuvent parfois donner des sasultats inattendus. Par exemple, convertir un factor en numeric sans passer par la fonction `as.character`.
+
+```{r}
+x <- as.factor(c(1, 2, 5, 6))
+class(x)
+
+x
+as.numeric(x)
+
+x <- as.character(x)
+as.numeric(x)
+```
+
+
 ## Les tests logiques
 ### Principe
+
 L'essentiel du codage et du recodage s'opère avec des instructions logiques simples (égal, différent, inférieur ou supérieur à) que l'on peut combiner sur une variable ou plusieurs variables). On utilise pour cela des tests.
 
 Un test est une opération logique de comparaison qui renvoie vrai (`TRUE`) ou faux (`FALSE`) pour chacun des éléments d'un vecteur.
@@ -51,6 +118,7 @@ vec == "Jaune" | vec == "Vert"
 ```
 
 ### L'opérateur %in%
+
 À noter que dans ce cas, on peut utiliser l'opérateur `%in%`[^1], qui teste si une valeur fait partie des éléments d'un vecteur :
 
 [^1]: Pour accéder à la page de documentation de fonctions comme `%in%`, on ne peut pas utiliser `?%in%`, qui renvoie une erreur. Vous pouvez faire `?"%in%"`, `help("%in%")` ou, dans ce cas, `?match`, car les deux fonctions sont documentées sur la même page d'aide.
@@ -59,8 +127,8 @@ vec == "Jaune" | vec == "Vert"
 vec %in% c("Jaune", "Vert")
 ```
 
-
 ### Le cas des NA
+
 ::: callout-warning
 Attention, si on souhaite tester si une valeur `x` est inconnue (ou 'manquante'), c'est-à-dire si elle est codée `NA` (*Not Available*), faire le test `x == NA` *ne donnera pas le résultat escompté*. En effet, fidèle à sa réputation de rigueur informaticienne, pour R `NA == NA` ne vaut pas `TRUE` mais... `NA` (on ne sait pas si une valeur inconnue est égale à une autre valeur inconnue).
 
@@ -74,7 +142,6 @@ Enfin, on peut inverser un test avec l'opérateur *non* (`!`) :
 ```{r}
 !(vec %in% c("Jaune", "Vert"))
 ```
-
 
 ### Exercices
 
@@ -130,4 +197,425 @@ rp$immi == 1 &
   rp$stocd != 10
 ```
 
-## Le codage
+
+# Le tidyverse
+
+Le terme *tidyverse* est une contraction de *tidy* (qu'on pourrait traduire par "bien rangé") et de *universe*. Il s'agit en fait d'une collection d'extensions conçues pour travailler ensemble et basées sur une philosophie commune :
+
+-   `ggplot2` (visualisation)
+-   `dplyr` (manipulation des données)
+-   `tidyr` (remise en forme des données)
+-   `purrr` (programmation)
+-   `readr` (importation de données)
+-   `tibble` (tableaux de données)
+-   `forcats` (variables qualitatives)
+-   `stringr` (chaînes de caractères)
+-   `lubridate` (manipulation de dates)
+
+Un des objectifs de ces extensions est de fournir des fonctions avec une syntaxe cohérente, qui fonctionnent bien ensemble, et qui retournent des résultats prévisibles. Nous allons recourrir à cette syntaxe pour transformer nos données.
+
+## Filtrer des lignes et sélectionner des colonnes
+### `filter`
+
+`filter` sélectionne des lignes d'une table selon une condition. On lui passe en paramètre un test, et seules les lignes pour lesquelles ce test renvoie `TRUE` (vrai) sont conservées. On réutilise donc les opérateurs logiques vus dans le cas des tests. Puisque le premier argument est le tableau en lui-même, il n'est plus nécessaire d'utiliser l'opérateur `$` et il suffit d'utiliser le nom dans colonnes pour filter.
+
+```{r}
+# Filtre pour sélectionner les femmes
+rp_f <- filter(rp, sexe == 2)
+
+# Filtre pour sélectionner les femmes immigrées
+rp_f <- filter(rp, sexe == 2 & immi == 1)
+```
+
+On peut également placer des fonctions dans les tests, qui nous permettent par exemple de sélectionner les personnes qui sont plus âgées que l'âge médian.
+
+```{r}
+rp_senior <- filter(rp, agerev > median(agerev))
+```
+
+### `select`
+
+`select` permet de sélectionner des colonnes d'un tableau de données.
+
+```{r}
+# Sélectionner uniquement les colonnes du sexe et de l'âge
+select(rp, sexe, agerev)
+```
+
+Si on fait précéder le nom d'un `-`, la colonne est éliminée plutôt que sélectionnée :
+
+```{r}
+# Sélectionner toutes les colonnes sauf le sexe et l'âge
+select(rp, -sexe, -agerev)
+```
+
+## Créer une colonne et recoder sous conditions
+
+### `mutate`
+
+La fonction `mutate` permet de créer une nouvelle colonne. C'est une alternative à la méthode de base avec l'opétaeur \$. Le premier type de recodage consiste à changer la nature d'une colonne. On vérifie la nature d'une colonne avec la fonction `class` et on peut la modifier avec les fonctions de la forme `as.nature_désirée` : `as.integer`, `as.character` etc.
+
+```{r}
+# Vérifier la nature de la variable
+class(rp$agerev)
+
+# On transforme cette colonne en format texte
+# Ancienne solution avec l'opérateur $
+rp$agerev_txt <- as.character(rp$agerev)
+class(rp$agerev_txt)
+
+# Nouvelle solution avec la fonction mutate
+# Attention : on transforme le tableau de données, plus seulement une colonne
+# À nouveau, on fait directement référence au nom des colonnes
+rp <-
+  mutate(
+    # Le premier argument est le tableau à modifié
+    rp,
+    # Le deuxième la variable à créer : son nom puis son contenu
+    agerev_txt = as.character(agerev)
+  )
+```
+
+### `if_else`
+
+La fonction `if_else` permet de faire une action sous condition : si l'âge est supérieur à 18, donne la valeur "majeur.e", sinon donne la valeur "mineur.e". case_when étend ce fonctionnement à plus d'une possibilité : si l'âge est supérieur à 18 donne "majeur.e", si l'âge est compris entre 18 et 64 donne "adulte", si l'âge est supérieur à 64 donne "senior".
+
+On pourra dire à R : crée une nouvelle colonne (`mutate`) à partir d'un test sur la valeur initiale de la variable (`if_else`).
+
+```{r}
+# Voici deux versions du codage de l'âge des personnes recensées, soit la variable agerev. La première est lisible, la deuxième est commentée ligne par ligne.
+
+# Version plus lisible sans les commentaires
+rp <- mutate(
+  rp,
+  age_rec = 
+    if_else(
+      agerev > 17,
+      "Majeur.e",
+      "Mineur.e"
+    )
+)
+
+# Version commentée
+rp <-
+  # J'utilise la fonction mutate pour créer une colonne
+  mutate(
+    # Le premier argument de mutate, le tableau à transformer
+    rp,
+    # Le deuxième argument de mutate, le nom de la colonne à créer (à gauche du =) et la valeur que je lui donne (à droite du =)
+    age_rec = 
+      # Elle sera créée à l'aide du test opérée par la fonction ifelse
+      if_else(
+        # Le premier argument de ifelse, la condition
+        agerev > 17,
+        # Le deuxième argument de ifelse, la valeur à donner si la condition est vérifiée
+        "Majeur.e", 
+        # Le troisième argument de ] ifelse, la valeur à donner si la condition n'est pas vérifié
+        "Mineur.e"
+        # Je ferme la parenthèse de la fonction if_else
+      )
+    # Je ferme la parenthèse de la fonction mutate
+  ) 
+
+# On obtient bien une nouvelle variable/colonne nommée age_rec qui prend soit la valeur "Mineur.e", soit la valeur "Majeur.e"
+```
+
+### `case_when`
+
+Dès qu'on veut utiliser plus d'un test (par exemple, obtenir trois valeurs : mineur.e, adulte, senior), il faut utiliser la fonction case_when.
+
+```{r}
+# Version lisible
+rp <- 
+  mutate(
+  rp,
+  age_rec =
+    case_when(
+      agerev < 18 ~ "Mineur.e",
+      agerev > 17 & agerev < 65 ~ "Adulte",
+      agerev > 64 ~ "Senior"
+    )
+)
+
+
+# Version commentée
+rp <-
+  # Je crée une variable grâce à la fonction mutat
+  mutate(
+    # Le premier argument, je transforme le tableau rp
+    rp,
+    # Le deuxième argument, la variable à créer
+    age_rec = 
+      # Qui sera créee grâce à la fonction case_when
+      case_when(
+        # À gauche du "~", c'est la condition, à droite la valeur
+        # Si agerev est strictement inférieur à 18, alors la variable prendra la valeur "Mineur.e"
+        agerev < 18 ~ "Mineur.e",
+        # Si agerev est strictement supérieur à 17 ET qu'agerev est strictement inférieur à 65, alors la variable prendra la valeur "Adulte"
+        agerev > 17 & agerev < 65 ~ "Adulte",
+         # Si agerev est strictement supérieur à 64, alors la variable prendra la valeur "Senior"
+        agerev > 64 ~ "Senior"
+        # Je ferme la parenthèse de la fonction case_when
+      )
+     # Je ferme la parenthèse de la fonction mutate
+  )
+```
+
+
+## Exercices
+
+1.  Créez une nouvelle variable (colonne) qui vaut 1 si l'individu est propriétaire et 0 sinon.
+2.  Créez une nouvelle variable qui vaut 1 si l'individu est logé dans le secteur libre et 0 si l'individu est logé dans le secteur HLM.
+3.  Créez un nouveau tableau de données `rp_prop` qui ne contient que les individus propriétaires. Faites de même avec `rp_hlm` qui ne contient que les individus du secteur HLM.
+4.  Calculez la part de propriétaires à Lyon. Calculez la part de personnes logées dans le secteur HLM.
+5.  Créez une nouvelle variable dont les trois modalités seront d'être propriétaire, d'être locataire et d'être locataire HLM.
+6.  Calculez les effectifs et les parts de chacun de ces trois statuts d'occupation.
+7.  Créez une variable catégorielle synthétique qui croise le genre et le statut d'occupation du logement.
+
+```{r}
+# 1
+rp <-
+  mutate(
+    rp,
+    prop =
+      if_else(
+        stocd == 10,
+        1,
+        0
+      )
+  )
+
+# 2
+rp <- 
+  mutate(
+    rp,
+    libre = 
+      if_else(
+        stocd != 22,
+        1,
+        0
+      )
+  )
+
+# 3
+rp_prop <- filter(rp, prop == 1)
+rp_hlm <- filter(rp, libre != 1)
+
+# 4
+tab_prop <- wtd.table(rp$prop, weights = rp$ipondi)
+proportions(tab_prop)
+
+tab_libre <- wtd.table(rp$libre, weights = rp$ipondi)
+proportions(tab_libre)
+
+# 5
+rp <- 
+  mutate(
+    rp,
+    stat_occ = 
+      case_when(
+        stocd == 10 ~ "Propriétaire",
+        stocd %in% c(21, 23, 30) ~ "Locataire",
+        stocd == 22 ~ "Locataire HLM"
+      )
+  )
+
+
+# 6
+tab_stat_occ <- wtd.table(rp$stat_occ, weights = rp$ipondi, useNA = "always")
+proportions(tab_stat_occ)
+
+# 7
+rp <-
+  mutate(
+    rp,
+    occ_genre = 
+      case_when(
+        stat_occ == "Locataire" & sexe == 1 ~ "Homme locataire",
+        stat_occ == "Propriétaire" & sexe == 1 ~ "Homme propriétaire",
+        stat_occ == "Locataire HLM" & sexe == 1 ~ "Homme locataire HLM",
+        stat_occ == "Locataire" & sexe == 2 ~ "Femme locataire",
+        stat_occ == "Propriétaire" & sexe == 2 ~ "Femme propriétaire",
+         stat_occ == "Locataire HLM" & sexe == 2 ~ "Femme locataire HLM"
+      ),
+    occ_genre = fct(occ_genre,
+                    levels = c("Homme propriétaire",
+                               "Homme locataire",
+                               "Homme locataire HLM",
+                               "Femme propriétaire",
+                               "Femme locataire",
+                               "Femme locataire HLM"))
+  )
+
+```
+
+
+
+### `fct`
+
+Nous n'avons pas spécifié la nature de notre nouvelle colonne/vecteur. On cherche ici à créer un facteur puisqu'on a une variable catégorielle. La fonction `fct` permet de créer un vecteur et de spécifier l'ordre de ses modalités (quand on fera des tableaux ou des graphiques, on voudra que "Senior" apparaisse en dernier, et non entre "Mineur.e" et "Majeur.e"
+
+```{r}
+# Un vecteur de type texte qui renseigne la catégorie d'âge de 6 personnes
+cat_age <- c("Mineur.e", 
+             "Adulte", 
+             "Adulte", 
+             "Senior", 
+             "Mineur.e",
+             "Senior")
+# Le tri croisé ne donne pas quelque chose d'intuitif :
+table(cat_age)
+# La catégorie adulte apparaît avant mineur.e
+# On le transforme en facteur
+cat_age <-
+  fct(
+    # Le premier argument, le facteur à transformer
+    cat_age, 
+      # Le deuxième argument, les modalités (levels) avec l'ordre d'apparition
+      levels =  c("Mineur.e", "Adulte", "Senior")
+      )
+# Le problème est résolu
+table(cat_age)
+```
+
+Finalement, la fonction `irec` permet de réaliser le recodage d'une variable catégorielle par le biais d'une interface. Elle vous permet de changer les modalités d'une variable, par exemple passer d'un codage numérique aux étiquettes en texte, en faisant appel à la fonction `fct_recode`. Elle n'est à lancer qu'une fois pour obtenir le code et peut être retirée par la suite.
+
+```{r}
+#| eval: false
+
+# Recodage interactif de la variable sexe
+irec(rp$sexe)
+```
+
+```{r}
+## Recoding rp$sexe into rp$sexe_rec
+rp$sexe_rec <- rp$sexe %>%
+  as.character() %>%
+  fct_recode(
+    "Hommes" = "1",
+    "Femmes" = "2"
+  )
+```
+
+## Exercices
+
+1.  Créez une variable catégorielle appelée `immigre` à deux modalités : Immigré/Non immigré
+
+2.  Créez une variable catégorielle `stat_immi` à trois modalités : Immigré étranger/immigré français/français non immigré
+
+```{r}
+# 1
+rp <-
+  mutate(
+    rp,
+    immigre = 
+      fct(
+        if_else(immi == 1, "Immigré", "Non immigré"),
+        levels = c("Immigré", "Non immigré")
+  )
+  )
+
+# 2
+rp <-
+  mutate(
+    rp,
+    stat_immi =
+      fct(
+        case_when(
+          immi == 1 & inatc == 2 ~ "Immigré étranger",
+          immi == 1 & inatc == 1 ~ "Immigré français",
+          immi == 2 ~ "Français non immigré"
+        ),
+        levels = c("Immigré étranger",
+                   "Immigré français",
+                   "Français non immigré")
+      )
+  )
+```
+
+## Calculer des indicateurs dans des sous-groupes
+
+Les opérations de comparaison d'indicateurs impliquent qu'il faille répéter le même calcul au sein de sous-groupes distincts. Deux fonctions permettront d'aboutir à un tel résultat.
+
+### Summarize et .by
+
+La fonction `summarize` permet d'obtenir un tableau synthétique qui recense le résultat d'opérations de calcul. Elle s'utilise avec l'argument `.by` qui définit dans quelles sous-populations le logiciel doit travailler : chez les hommes puis chez les femmes (distinguées par la variable `sexe`), par arrondissements (distingués par la variable `arm`) etc.
+
+```{r}
+# La moyenne d'âge des lyonnais·es
+mean(rp$agerev)
+
+# La fonction summarize sans groupes spécifiés par .by
+summarize(rp, 
+          age_m = mean(agerev))
+# On obtient 1 seule ligne : la moyenne d'âge des lyonnais·es
+
+# La fonction summarize avec groupes spécifiés par .by
+summarize(rp, 
+          age_m = mean(agerev),
+          .by = sexe)
+# On obtient 2 lignes : l'âge moyen des femmes et des hommes
+```
+
+L'argument `.by` peut aussi être un argument de la fonction `mutate`. On peut par exemple vouloir créer une colonne qui ajoute une variable à chaque individu renseignant la valeur prise par le sous-groupes. Par exemple, l'âge moyen dans le groupe définit par le sexe, pour ensuite faire l'écart entre l'âge de l'individu et l'âge moyen des personnes de même sexe.
+
+```{r}
+# Créer une colonne qui renseigne l'âge moyen dans le sous-groupe de sexe
+rp <- 
+  mutate(
+    rp,
+    age_m = mean(agerev),
+    .by = sexe)
+
+# Vérifier le résultat
+rp$age_m
+
+
+# Calculer la différence entre l'âge individuel et l'âge moyen dans le sous-groupe de sexe
+rp <- 
+  mutate(
+    rp,
+    dif_age_m = agerev - age_m)
+
+# Vérifier le résultat
+rp$dif_age_m
+```
+
+## Exercices
+
+1.  Calculez l'âge moyen des immigré·es et des non-immigré·es
+2.  Calculez l'âge moyen des immigré·es et des non-immigré·es selon le sexe
+3.  Créez une colonne `age_immisexe` de l'âge moyen selon le statut d'immigration
+4.  Créez une colonne qui fais la différence entre l'âge individuel et l'âge moyen `age_immisexe`
+
+```{r}
+# 1
+summarize(
+  rp,
+  age_m = mean(agerev),
+  .by = immi
+)
+
+# 2
+summarize(
+  rp,
+  age_m = mean(agerev),
+  .by = c(immi, sexe)
+)
+
+# 3
+rp <-
+  mutate(
+    rp,
+    age_m = mean(agerev),
+    .by = c(immi, sexe)
+  )
+
+
+# 4
+rp <-
+  mutate(
+    rp,
+    diff_age_m = agerev - age_m,
+  )
+```
