@@ -1,0 +1,143 @@
+---
+title: "M1_Seance_3_corr"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+# L'enquête Histoire de Vie 2003
+
+```{r}
+library(questionr)
+data(hdv2003)
+```
+
+L'enquête Histoire de vie a pour objectifs de décrire, de hiérarchiser, d'analyser les différents types de liens sociaux qui permettent aux individus de s'intégrer dans la société française. Elle a été produite par l'INSEE en 2003. Vous travaillez ici sur un jeu de données d'exemple représentant une extraction de 2000 individus.
+
+# Construire un tableau statistique
+
+## Tri à plat
+### Compter les effectifs absolus
+
+La fonction `table` fait partie des fonctions intégrées au R de base. Elle permet de réaliser des tris à plat sur un vecteur et des tris croisés sur deux vecteurs.
+
+Le tableau `hdv2003` contient une colonne `sexe` qui correspond à la variable qui vaut Homme si l'individu enquêté est un homme et Femme si l'individu est une femme. Il n'est donc pas nécessaire de recoder la variable, ce qui est parfois le cas quand les modalités sont codées avec des chiffres comme 1 pour homme et 2 pour femme On peut compter le nombre d'hommes et de femmes :
+
+```{r}
+table(hdv2003$sexe)
+```
+
+On peut aussi connaître les effectifs de chaque catégorie d'emploi en réalisant un tri à plat sur la colonne `occup`.
+
+```{r}
+table(hdv2003$occup)
+```
+
+### Calculer les pourcentages
+
+Souvent, on cherche plutôt à obtenir des pourcentages que des effectifs absolus. La fonction `proportions` permet de calculer la part associée chaque modalité de la variable. Elle s'applique à l'objet créé par la fonction `table`.
+
+**Attention, cette fonction ne s'applique qu'au tri à plat sur une variable et ne donnera pas le résultat attendu pour les tris croisés de deux variables.**
+
+La part d'hommes/de femmes dans la population enquêtee :
+
+```{r}
+tab_sexe <- table(hdv2003$sexe)
+proportions(tab_sexe)
+```
+
+La dsitribution des statuts d'emploi :
+
+```{r}
+tab_emploi <- table(hdv2003$occup)
+proportions(tab_emploi)
+```
+
+On peut encore modifier ce tableau pour faciliter la lecture, par exemple en convertissant cette proportion en pourcentages
+
+```{r}
+# En décomposant ligne par ligne
+tab_sexe <- table(hdv2003$sexe)
+tab_sexe <- proportions(tab_sexe)
+tab_sexe <- tab_sexe*100
+tab_sexe <- round(tab_sexe, 2)
+tab_sexe
+```
+
+### Exercices
+Faites un tri à plat sur la variable `relig` puis calculez les proportions.
+```{r}
+tab_relig <- table(hdv2003$relig)
+proportions(tab_relig)
+```
+
+Faites un tri à plat sur la variable `trav.imp` puis calculez les proportions.
+```{r}
+tab_travimp <- table(hdv2003$trav.imp)
+proportions(tab_travimp)
+```
+
+Faites un tri à plat sur la variable `trav.imp` en incluant les `NA` puis calculez les proportions
+```{r}
+tab_travimp <- table(hdv2003$trav.imp, useNA = "always")
+proportions(tab_travimp)
+```
+
+### Croiser des variables
+
+Pour croiser deux variables, il suffit d'ajouter la deuxième colonne comme deuxième argument. La distribution du statut d'emploi selon le sexe :
+
+```{r}
+tab_sexe_emploi <- table(hdv2003$sexe, hdv2003$occup)
+tab_sexe_emploi
+```
+
+Pour les tableaux croisés, les fonctions `rprop` et `cprop` du package `questionr` permettent d'obtenir très facilement les pourcentages en ligne (r comme rows) ou en colonne (c comme columns) ainsi que les marges.
+
+```{r}
+rprop(tab_sexe_emploi)
+cprop(tab_sexe_emploi)
+```
+
+**En fonction de l'ordre que vous avez choisi pour la fonction `table`** **puis de la fonction r/cprop, vous n'aurez pas les mêmes résultats !**
+
+### Exercices
+Faites un tri croisé de la variable `sexe` avec la variable `relig` puis calculez les pourcentages en ligne puis en colonnes. 
+
+```{r}
+tab_sexe_relig <- table(hdv2003$sexe, hdv2003$relig)
+rprop(tab_sexe_relig)
+cprop(tab_sexe_relig)
+```
+
+Faites un tri croisé de la variable `relig` avec la variable `sexe` puis calculez les pourcentages en ligne puis en colonne. 
+
+```{r}
+tab_relig_sexe <- table(hdv2003$relig, hdv2003$sexe)
+rprop(tab_sexe_relig)
+cprop(tab_sexe_relig)
+```
+
+## Pondérer un tri à plat ou un tri croisé
+La plupart des jeux de données sont livrés avec une pondération que vous devez obligatoirement utiliser pour garantir la représentativité de vos traitements (à venir séance 5). Il faut pour cela utiliser une autre fonction intégrée au package `questionr`. 
+**Attention, cela signifie que si vous n'avez pas installé le package puis chargé le package avec `library(questionr)`, vous ne pourrez pas utiliser cette fonction**.
+
+### La fonction `wtd.table`
+La fonction `wtd.table` fonctionne comme la fonction `table` sauf qu'elle permet de rajouter un argument pour les poids : `wt = `
+
+```{r}
+tab_relig_sexe <- wtd.table(hdv2003$sexe, hdv2003$relig, hdv2003$poids)
+rprop(tab_sexe_relig)
+cprop(tab_sexe_relig)
+```
+
+### Exercice
+Calculez les pourcentages pondérés d'hommes et de femmes qui lisent des BD
+
+```{r}
+tab_sexe_bd <- wtd.table(hdv2003$sexe, hdv2003$lecture.bd, hdv2003$poids)
+rprop(tab_sexe_bd)
+cprop(tab_sexe_bd)
+```
+
