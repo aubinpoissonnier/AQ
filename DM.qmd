@@ -1,0 +1,88 @@
+---
+title: "DM"
+format: html
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(tidyverse)
+library(questionr)
+
+download.file("https://data.sciencespo.fr/api/access/datafile/5682?format=tab&gbrecs=true",
+               "sven.tab")
+sven <- read.table("sven.tab", header = T)
+```
+
+# Entraînement sur la base SVEN
+
+## Présentation de l'enquête
+
+Cette base de données a été construite à partir des données de l’enquête Styles de vie et Environnement (2017). L'enquête Styles de vie et Environnement (SVEN) propose d’explorer conjointement les représentations et attitudes des Français à l’égard des questions d’environnement et l’impact environnemental de leurs modes de vie. L'enquête vise à explorer les implications sociales et politiques du consensus scientifique et politique qui existe aujourd’hui autour de l’idée que les caractéristiques des modes de vie courants dans les sociétés occidentales contemporaines sont à l’origine d’importantes externalités environnementales qui contribuent fortement au changement climatique et à l’épuisement des ressources, aussi bien qu’à la réduction de la biodiversité.
+
+## Accès au dictionnaire des codes
+
+Le dictionnaire des codes est disponible en [cliquant sur ce lien](https://data.sciencespo.fr/api/access/datafile/5684?gbrecs=true).
+Il faut télécharger le fichier .zip, extraire le dictionnaire des codes sous format `.xlsx` (cliquer/glisser du .zip à votre ordinateur) puis ouvrir le dictionnaire avec Excel ou Libre Office Calc.
+
+# Devoir maison
+
+1. Accédez à la colonne `ponderation` du tableau de donnée
+
+```{r}
+
+```
+
+2. Réalisez un tri à plat non pondéré sur la colonne `demo_age`, la variable de tranche d'âge des enquêté.es
+
+```{r}
+
+```
+
+3. Réalisez un tri à plat pondéré sur la colonne `demo_age`
+
+```{r}
+
+```
+
+4. Recodez les modalités de la variable `demo_age` avec les tranches d'âge concernées ("18 à 34 ans" plutôt que "1" etc.). Vous appelerez cette nouvelle colonne `demo_age_rec`.
+
+```{r}
+
+```
+
+4. Calculez les proportions à partir du tri à plat pondéré de la variable `demo_age_rec`.
+
+```{r}
+
+```
+
+5. Recodez la variable `enjeu_climat` selon la même logique que le recodage de la variable `demo_age_rec`, en remplaçant les catégories sous formes de chiffre en texte explicite
+
+```{r}
+
+```
+
+6. Réalisez un tri croisé pondéré de la variable `demo_age_rec` avec `enjeu_climat_rec`, la colonne que vous avez créée dans la question 5.
+
+```{r}
+
+```
+
+7. Calculez les pourcentages en ligne du tri croisé de la question 6.
+```{r}
+
+```
+
+8. Construisez un diagramme en barre pondéré de la catégorie d'âge
+
+```{r}
+
+```
+
+9. Construisez un diagramme en barre pondéré représentant le rapport à l'enjeu du climat vis-à-vis de la catégorie d'âge
+
+```{r}
+
+```
+

@@ -1,0 +1,119 @@
+---
+title: "DM"
+format: html
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(tidyverse)
+library(questionr)
+
+download.file("https://data.sciencespo.fr/api/access/datafile/5682?format=tab&gbrecs=true",
+               "sven.tab")
+sven <- read.table("sven.tab", header = T)
+```
+
+# Entraînement sur la base SVEN
+
+## Présentation de l'enquête
+
+Cette base de données a été construite à partir des données de l’enquête Styles de vie et Environnement (2017). L'enquête Styles de vie et Environnement (SVEN) propose d’explorer conjointement les représentations et attitudes des Français à l’égard des questions d’environnement et l’impact environnemental de leurs modes de vie. L'enquête vise à explorer les implications sociales et politiques du consensus scientifique et politique qui existe aujourd’hui autour de l’idée que les caractéristiques des modes de vie courants dans les sociétés occidentales contemporaines sont à l’origine d’importantes externalités environnementales qui contribuent fortement au changement climatique et à l’épuisement des ressources, aussi bien qu’à la réduction de la biodiversité.
+
+## Accès au dictionnaire des codes
+
+Le dictionnaire des codes est disponible en [cliquant sur ce lien](https://data.sciencespo.fr/api/access/datafile/5684?gbrecs=true).
+Il faut télécharger le fichier .zip, extraire le dictionnaire des codes sous format `.xlsx` (cliquer/glisser du .zip à votre ordinateur) puis ouvrir le dictionnaire avec Excel ou Libre Office Calc.
+
+# Devoir maison
+
+1. Accédez à la colonne `ponderation` du tableau de donnée
+
+```{r}
+sven$ponderation
+```
+
+2. Réalisez un tri à plat non pondéré sur la colonne `demo_age`, la variable de tranche d'âge des enquêté.es
+
+```{r}
+table(sven$demo_age)
+```
+
+3. Réalisez un tri à plat pondéré sur la colonne `demo_age`
+
+```{r}
+wtd.table(sven$demo_age, weights = sven$ponderation)
+```
+
+4. Recodez les modalités de la variable `demo_age` avec les tranches d'âge concernées ("18 à 34 ans" plutôt que "1" etc.). Vous appelerez cette nouvelle colonne `demo_age_rec`.
+
+```{r}
+sven <-
+  mutate(sven,
+         demo_age_rec = 
+           case_when(
+             demo_age == 1 ~ "18-34 ans",
+             demo_age == 2 ~ "35-44 ans",
+             demo_age == 3 ~ "45-54 ans",
+             demo_age == 4 ~ "55-64 ans",
+             demo_age == 5 ~ "Plus de 65 ans"
+           ))
+```
+
+4. Calculez les proportions à partir du tri à plat pondéré de la variable `demo_age_rec`.
+
+```{r}
+tab_age <- wtd.table(sven$demo_age_rec, weights = sven$ponderation)
+proportions(tab_age)
+```
+
+5. Recodez la variable `enjeu_climat` selon la même logique que le recodage de la variable `demo_age_rec`, en remplaçant les catégories sous formes de chiffre en texte explicite
+
+```{r}
+sven <-
+  mutate(sven,
+         enjeu_climat_rec = 
+           case_when(
+             enjeu_climat == 1 ~ "Très préoccupé",
+             enjeu_climat == 2 ~ "Assez préoccupé",
+             enjeu_climat == 3 ~ "Peu préoccupé",
+             enjeu_climat == 4 ~ "Pas du tout préoccupé",
+             enjeu_climat == 5 ~ "Je ne sais pas",
+             enjeu_climat == 9 ~ "N'a pas répondu"
+           ))
+```
+
+6. Réalisez un tri croisé pondéré de la variable `demo_age_rec` avec `enjeu_climat_rec`, la colonne que vous avez créée dans la question 5.
+
+```{r}
+wtd.table(sven$demo_age_rec, sven$enjeu_climat_rec, weights = sven$ponderation)
+```
+
+7. Calculez les pourcentages en ligne du tri croisé de la question 6.
+```{r}
+tab_age_climat <- wtd.table(sven$demo_age_rec, sven$enjeu_climat_rec, weights = sven$ponderation)
+rprop(tab_age_climat)
+```
+
+8. Construisez un diagramme en barre pondéré de la catégorie d'âge
+
+```{r}
+ggplot(sven) +
+  geom_bar(
+    aes(x = demo_age_rec,
+        weights = ponderation)
+  )
+```
+
+9. Construisez un diagramme en barre pondéré représentant le rapport à l'enjeu du climat vis-à-vis de la catégorie d'âge
+
+```{r}
+ggplot(sven) +
+  geom_bar(
+    aes(x = demo_age_rec,
+        fill = enjeu_climat_rec,
+        weights = ponderation),
+    position = "dodge"
+  )
+```
+

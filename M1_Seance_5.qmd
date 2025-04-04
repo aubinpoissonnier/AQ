@@ -5,19 +5,21 @@ editor: visual
 editor_options: 
   chunk_output_type: console
 ---
+
 # Données
+
 ```{r}
 library(weights)
 library(questionr)
 data(hdv2003)
-download.file("https://data.sciencespo.fr/api/access/datafile/5682?format=tab&gbrecs=true",
-               "sven.tab")
-sven <- read.table("sven.tab")
 ```
+
 # Réaliser un test du khi2
+
 ## Fonction de base
 
 Le test du khi2 sur R s'effectue à l'aide de la fonction `chisq.test`. Il suffit de lui fournir les variables (les colonnes du tableau) que l'on veut croiser.
+
 ```{r}
 # Tableau croisé de la catégorie socio-profesionnelle et du sentiment d'appartenance à une classe sociale
 tab_qualif_clso <- table(hdv2003$qualif, hdv2003$clso)
@@ -28,12 +30,12 @@ chisq.test(hdv2003$qualif, hdv2003$clso)
 ```
 
 ## Exercice
+
 Construisez un tableau croisé entre le genre et l'importance accordée au travail puis réalisez un test du khi2.
 
 ```{r}
 
 ```
-
 
 ## Fonction pondérée
 
@@ -48,16 +50,16 @@ rprop(tab_qualif_clso)
 wtd.chi.sq(hdv2003$qualif, hdv2003$clso, weight = hdv2003$poids)
 ```
 
-
 ## Exercice
+
 Construisez un tableau croisé pondéré entre le genre et l'importance accordée au travail puis réalisez un test du khi2 pondéré.
 
 ```{r}
 
 ```
 
-
 # Entraînement sur la base SVEN
+
 ## Présentation de l'enquête
 
 Cette base de données a été construite à partir des données de l’enquête Styles de vie et Environnement (2017). L'enquête Styles de vie et Environnement (SVEN) propose d’explorer conjointement les représentations et attitudes des Français à l’égard des questions d’environnement et l’impact environnemental de leurs modes de vie. L'enquête vise à explorer les implications sociales et politiques du consensus scientifique et politique qui existe aujourd’hui autour de l’idée que les caractéristiques des modes de vie courants dans les sociétés occidentales contemporaines sont à l’origine d’importantes externalités environnementales qui contribuent fortement au changement climatique et à l’épuisement des ressources, aussi bien qu’à la réduction de la biodiversité.
@@ -65,4 +67,3 @@ Cette base de données a été construite à partir des données de l’enquête
 ## Accès au dictionnaire des codes
 
 Le dictionnaire des codes est disponible en [cliquant sur ce lien](https://data.sciencespo.fr/api/access/datafile/5684?gbrecs=true).
-
