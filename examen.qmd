@@ -49,25 +49,25 @@ Proposez une lecture des graphiques suivants en respectant les normes de rédact
 
 1.  Évolution de la précarité de l'emploi salarié selon l'âge
 
-![](images/emploi_age.png){fig-align="center" width="428"}
+![](emploi_age.png){fig-align="center" width="428"}
 
 Réponse :
 
 2.  Contraintes de temps de travail subies par les salariés en horaires atypiques
 
-![](images/horaires.png){fig-align="center" width="527"}
+![](horaires.png){fig-align="center" width="527"}
 
 Réponse :
 
 3.  Nombre de livres lus selon la catégorie sociale
 
-![](images/lecture.png){fig-align="center" width="600"}
+![](lecture.png){fig-align="center" width="600"}
 
 Réponse :
 
 4.  Évolution de la part de non-lecteurs selon la catégorie sociale
 
-![](images/lecteurs-01.png){fig-align="center" width="477"}
+![](lecteurs-01.png){fig-align="center" width="477"}
 
 Réponse :
 
