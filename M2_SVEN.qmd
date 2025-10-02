@@ -1,0 +1,26 @@
+---
+title: "M2_SVEN"
+format: html
+---
+
+# La base Styles de vie et environnement
+
+## Présentation de l'enquête
+
+Cette base de données a été construite à partir des données de l’enquête Styles de vie et Environnement (2017). L'enquête Styles de vie et Environnement (SVEN) propose d’explorer conjointement les représentations et attitudes des Français à l’égard des questions d’environnement et l’impact environnemental de leurs modes de vie. L'enquête vise à explorer les implications sociales et politiques du consensus scientifique et politique qui existe aujourd’hui autour de l’idée que les caractéristiques des modes de vie courants dans les sociétés occidentales contemporaines sont à l’origine d’importantes externalités environnementales qui contribuent fortement au changement climatique et à l’épuisement des ressources, aussi bien qu’à la réduction de la biodiversité.
+
+## Accès au dictionnaire des codes
+
+Le dictionnaire des codes est disponible en [cliquant sur ce lien](https://data.sciencespo.fr/api/access/datafile/5684?gbrecs=true).
+
+## Chargement des données
+
+```{r}
+sven <- read.csv2("data/sven.csv")
+```
+
+# Analyse personnelle
+
+```{r}
+
+```
