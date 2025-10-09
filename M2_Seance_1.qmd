@@ -7,9 +7,11 @@ editor_options:
 ---
 
 ## Les données PISA
+
 PISA est le programme international de l'OCDE pour le suivi des acquis des élèves. PISA mesure la capacité des jeunes de 15 ans à utiliser leurs connaissances et compétences en compréhension de l’écrit, en mathématiques et en sciences pour relever les défis de la vie réelle.
 
 Vous travaillerez ici avec les données de l'année 2012 pour la France.
+
 ```{r}
 library(tidyverse)
 library(questionr)
@@ -18,7 +20,9 @@ pisa <- readRDS("data/pisa.RDS")
 ```
 
 ## La corrélation entre les scores
+
 La fonction `cor` permet de calculer la corrélation entre deux variables quantitatives.
+
 ```{r}
 # La corrélation de la longueur et de la largeur des pétales du jeu de données d'exemple iris 
 data(iris)
@@ -26,6 +30,7 @@ cor(iris$Sepal.Length, iris$Sepal.Width)
 ```
 
 Pour obtenir la version pondérée du coefficient de corrélation, il faut quelques étapes supplémentaires en R de base. Certains packages proposent des fonctions clefs en main.
+
 ```{r}
 # Création de poids aléatoires pour l'exemple
 iris$poids <- sample.int(dim(iris)[1])
@@ -36,45 +41,41 @@ wtd.cor(iris$Sepal.Length, iris$Sepal.Width, weight = iris$poids)
 ```
 
 ### Exercice
-1. Utilisez la fonction `summary` pour décrire la distribution du score de compréhension écrite `score_compecr` et en mathématiques `score_maths`
-```{r}
-summary(pisa$score_compecr)
-summary(pisa$score_maths)
-```
 
-Réponse : 
-
-2. Construisez un nuage de points pour représenter graphiquement le lien entre ces deux variables. Commentez.
+1.  Utilisez la fonction `summary` pour décrire la distribution du score de compréhension écrite `score_compecr` et en mathématiques `score_maths`
 
 ```{r}
-ggplot(pisa) +
-  geom_point(aes(x = score_compecr,
-                 y = score_maths))
+
 ```
 
-3. Calculez le coefficient de corrélation non pondéré entre le score de compréhension écrite et le score de compréhension orale. Écrivez une phrase de lecture.
-```{r}
-cor(pisa$score_compecr, pisa$score_maths)
-```
+Réponse :
 
-Réponse : 
-
-4. Calculez le coefficient de corrélation pondéré entre le score de compréhension écrite et le score de compréhension orale. Écrivez une phrase de lecture.
+2.  Construisez un nuage de points pour représenter graphiquement le lien entre ces deux variables. Commentez.
 
 ```{r}
-wtd.cor(pisa$score_compecr, pisa$score_maths, weight = pisa$poids)
+
 ```
 
-Réponse : 
-
-5. Chez les garçons et chez les filles, calculez le coefficient de corrélation pondéré entre le score de compréhension écrite et le score de compréhension orale . Écrivez une phrase de lecture.
+3.  Calculez le coefficient de corrélation non pondéré entre le score de compréhension écrite et le score de compréhension orale. Écrivez une phrase de lecture.
 
 ```{r}
-pisa_f <- filter(pisa, sexe == "Fille")
-pisa_g <- filter(pisa, sexe == "Garçon")
 
-wtd.cor(pisa_f$score_compecr, pisa_f$score_maths, weight = pisa_f$poids)
-wtd.cor(pisa_g$score_compecr, pisa_g$score_maths, weight = pisa_g$poids)
 ```
 
-Réponse : 
+Réponse :
+
+4.  Calculez le coefficient de corrélation pondéré entre le score de compréhension écrite et le score de compréhension orale. Écrivez une phrase de lecture.
+
+```{r}
+
+```
+
+Réponse :
+
+5.  Chez les garçons et chez les filles, calculez le coefficient de corrélation pondéré entre le score de compréhension écrite et le score de compréhension orale . Écrivez une phrase de lecture.
+
+```{r}
+
+```
+
+Réponse :
