@@ -16,6 +16,10 @@ Le dictionnaire des codes est disponible en [cliquant sur ce lien](https://data.
 ## Chargement des données
 
 ```{r}
+library(questionr)
+library(tidyverse)
+
+
 sven <- read.csv2("data/sven.csv")
 ```
 
