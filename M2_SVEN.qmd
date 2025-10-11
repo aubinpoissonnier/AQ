@@ -20,7 +20,7 @@ library(questionr)
 library(tidyverse)
 
 
-sven <- read.csv2("data/sven.csv")
+sven <- read.csv("data/sven.csv")
 ```
 
 # Analyse personnelle
