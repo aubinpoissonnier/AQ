@@ -1,0 +1,218 @@
+---
+title: "M2_Seance_2_corr"
+format: html
+editor_options: 
+  chunk_output_type: console
+---
+
+---
+title: "Séance 6"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+## Enquête PISA
+
+Dans l'enquête PISA, les compétences en mathématiques expriment l'aptitude des élèves de 15 ans à formuler, employer et interpréter des mathématiques dans de multiples contextes, pour décrire, expliquer et prévoir des phénomènes, en comprenant le rôle que les mathématiques jouent dans le monde.
+
+Les compétences à l'écrit expriment la capacité de comprendre, d'utiliser et d'interpréter des textes écrits en vue de réaliser ses objectifs, développer ses connaissances et son potentiel et prendre une part active dans la société. L'indicateur utilisé est le score moyen.
+
+Le statut socio-économique, ou plus précisément le statut économique, social et culturel de l'élève (ESCS) est un indice composite composé à partir de trois indices : le statut socioprofessionnel des parents (basé sur les métiers exercés par les parents), le niveau de formation (nombre d'années d'études) des parents, ainsi que le patrimoine familial. Ce dernier indice inclut lui-même un grand nombre de variables parmi lesquelles les ressources culturelles disponibles dans le foyer (livres), les ressources éducatives (un endroit calme pour travailler, des ouvrages de références ou des logiciels éducatifs) ainsi que d'autres ressources (voiture, connexion internet. . .)
+
+```{r}
+library(tidyverse)
+library(questionr)
+
+pisa <- readRDS("data/pisa.RDS")
+```
+
+## Les modèles de régression linéaire simple
+### Fonction
+
+Les modèles de régression linéaires peuvent être construits grâce à la fonction `lm`. Il faut alors utiliser une nouvelle notation, celle des formules utilisant l'opérateur `~`. À gauche de l'opérateur se trouve la variable expliquée, à droite la ou les variables explicatives. Il faut finalement indiquer le tableau de donnée sur lequel on travaille avec l'argument `data = ...`.
+
+```{r}
+# Construire un modèle de la longueur des pétales en fonction de leur longueur avec le jeu de données d'exemple iris
+data(iris)
+m1 <- lm(Petal.Length ~ Petal.Width, data = iris)
+m1
+```
+
+La fonction `summary` appliqué à l'objet `m1`, nom donné au résultat de notre modèle, permet directement d'obtenir la significativité des coefficients du modèle.
+
+```{r}
+summary(m1)
+```
+
+Le modèle permet d'estimer qu'en moyenne, une augmentation d'1 cm de la largeur des pétales est associée à une augmentation de 2,2 cm de la longueur des pétales. Ce coefficient est significatif au seuil de 1\%.
+
+### Exercices
+
+#### Variable explicative quantitative
+Construisez un modèle de régression linéaire expliquant le score en compréhension écrite `score_compecr` à partir du score en mathématiques `score_maths`. Proposez une lecture.
+
+```{r}
+m2 <- lm(score_compecr ~ score_maths, data = pisa)
+summary(m2)
+```
+
+Réponse : 
+
+#### Variable explicative qualitative
+Construisez un modèle de régression linéaire expliquant le score en compréhension écrite `score_compecr` à partir du genre `sexe`. Proposez une lecture.
+
+```{r}
+m3 <- lm(score_compecr ~ sexe, data = pisa)
+summary(m3)
+```
+
+Réponse : 
+
+## Les modèles de régression linéaire multiple
+### Fonction
+
+Pour complexifier le modèle et ajouter des variables explicatives, il suffit de modifier la formule avec l'opérateur `+`.
+
+```{r}
+# Construire un modèle de la longueur des pétales en fonction de leur longueur et de leur espèce avec le jeu de données d'exemple iris
+data(iris)
+m4 <- lm(Petal.Length ~ Petal.Width + Species, data = iris)
+summary(m4)
+
+# Lister les espèces pour savoir laquelle a été prise comme référence
+table(iris$Species)
+```
+
+Le modèle permet d'estimer qu'en moyenne, indépendamment de l'espèce de fleur, une augmentation d'1 cm de la largeur des pétales est associée à une augmentation de 1,0 cm de la longueur des pétales. Ce coefficient est significatif au seuil de 1\%.
+
+Le modèle permet d'estimer qu'en moyenne, indépendamment de la largeur des pétales, passer de l'espèce Setosa à l'espèce Versicolor augmente de 1,7cm la longueur des pétales, et de 2,3cm pour l'espèce Virginica. Ces coefficients sont significatifs au seuil de 1\%.
+
+### Exercices
+#### Une variable quantitative et une variable qualitative
+Construisez un modèle de régression linéaire expliquant le score en compréhension écrite `score_compecr` à partir du score en mathématiques `score_maths` et du genre `sexe`. Proposez une lecture.
+
+```{r}
+m5 <- lm(score_compecr ~ score_maths + sexe, data = pisa)
+summary(m5)
+```
+
+Réponse :
+
+#### Deux variables qualitatives
+Construisez un modèle de régression linéaire expliquant le score en compréhension écrite `score_compecr` à partir du genre `sexe` et du statut d'immigration `immi`. Proposez une lecture.
+```{r}
+m6 <- lm(score_compecr ~ sexe + immig, data = pisa)
+summary(m6)
+```
+
+## Les modèles de régression linéaire avec effets d'interaction
+### Fonction
+
+Pour complexifier le modèle et ajouter des variables explicatives, il faut modifier la formule avec l'opérateur `*`.
+
+```{r}
+# Construire un modèle de la longueur des pétales en fonction de l'interaction entre leur longueur et leur espèce avec le jeu de données d'exemple iris
+data(iris)
+m7 <- lm(Petal.Length ~ Petal.Width*Species, data = iris)
+summary(m7)
+```
+
+### Exercices
+#### Deux variables qualitatives
+Construisez un modèle de régression linéaire expliquant le score en compréhension écrite `score_compecr` à partir de l'interaction entre le genre `sexe` et le statut d'immigration `immi`. Proposez une lecture.
+
+```{r}
+m8 <- lm(score_compecr ~ sexe*immig, data = pisa)
+summary(m8)
+```
+
+Réponse : 
+
+#### Recodages et interaction
+Recodez la variable `immig` en une variable `immig2` à deux modalités, immigré e ou non immigré e.
+
+```{r}
+pisa <- mutate(pisa, immig2 = if_else(immig == "Non", "Non", "Oui"))
+```
+
+On suppose ici que l'effet de l'immigration sur le score en compréhension écrite diffère selon la position sociale de l'individu. On souhaite créer des quantiles de position sociale à partir de la variable quantitative `pos_soc`.
+
+On choisit de construire des classes d'effectifs qui hiérarchisent la population : les 20% les plus favorisés contre les 20% les plus défavorisés.
+
+```{r}
+# On crée des 5 quantiles de taille équivalente
+# Obtenir la valeur des quantiles
+quant_pos_soc <- quantile(pisa$pos_soc, probs = c(0, 0.2, 0.4, 0.6, 0.8, 1), na.rm = T)
+# On crée une nouvelle variable
+pisa <- 
+  mutate(
+    pisa, 
+    pos_soc_5c = 
+      cut(
+        x = pos_soc, 
+        breaks = quant_pos_soc,
+        labels = c("1er", "2ème", "3ème", "4ème", "5ème")
+      )
+  )
+```
+
+On peut comparer la distribution des scores en compréhension écrite selon le statut d'immigration et de la classe sociale. On construit pour cela une boîte à moustaches.
+
+```{r}
+# Création des boxplots
+pisa_filter <- filter(pisa, !is.na(pos_soc_5c) & !is.na(immig2))
+
+ggplot(pisa_filter) +
+  geom_boxplot(
+    aes(x = score_compecr,
+        color = pos_soc_5c,
+        y = immig2)
+  )
+```
+
+Construisez un modèle de régression linéaire expliquant le score en compréhension écrite `score_compecr` à partir de l'interaction entre le statut d'immigration `immig` et la position sociale en 5 classes `pos_soc_5c`. Proposez une lecture.
+
+```{r}
+m8 <- lm(score_compecr ~ immig2*pos_soc_5c, data = pisa)
+summary(m8)
+```
+## Les modèles de régression logistique
+### Fonction
+
+Les modèles de régression logistique sont construits avec la fonction `glm`. Il faut préciser que la valeur de l'argument `family =` est `binomial("logit")`.
+
+```{r}
+# Construire un modèle de régression logistique de la probabilité de redoubler en fonction du genre
+m9 <- glm(redouble ~ sexe, data = pisa, family = binomial("logit"))
+summary(m9)
+```
+
+Le modèle permet d'estimer que le fait d'être une fille plutôt qu'un garçon fait baisser la probabilité du redoublement. Ce coefficient est significatif au seuil de 5\%.
+
+
+### Exercices
+#### Modèles sans effets d'interaction
+Construisez un modèle de régression logistique de la probabilité de redoubler en fonction du statut d'immigration. 
+
+```{r}
+m10 <- glm(redouble ~ immig2, data = pisa, family = binomial("logit"))
+summary(m10)
+```
+
+Construisez un modèle de régression logistique de la probabilité de redoubler en fonction du statut d'immigration `immig2`, indépendamment de la position sociale `pos_soc`.
+
+```{r}
+m11 <- glm(redouble ~ immig2 + pos_soc, data = pisa, family = binomial("logit"))
+summary(m11)
+```
+
+#### Modèles avec effets d'interaction
+Construisez un modèle de régression logistique de la probabilité de redoubler en fonction de l'interaction entre le statut d'immigration `immig2` et de la position sociale en 5 classes `pos_soc_5c`.
+
+```{r}
+m12 <- glm(redouble ~ immig2*pos_soc_5c, data = pisa, family = binomial("logit"))
+summary(m12)
+```
+
