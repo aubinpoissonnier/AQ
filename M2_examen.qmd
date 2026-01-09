@@ -1,0 +1,144 @@
+---
+title: "Examen M2 MDV 2025"
+format: html
+editor: visual
+---
+
+# Questions de cours
+
+## 1. Tableau croisé
+
+Expliquez avec des mots simples ce que signifie construire un tableau croisé à partir de deux variables (quelle opération, qu'est-ce qui en résulte).
+
+Réponse :
+
+## 2. Coefficient de corrélation
+
+Une métropole, divisée en 20 arrondissements, cherche à étudier le lien entre la surface d'espace vert public accessible aux habitant es et le temps passé par ceux et celles-ci à se promener.\
+Son bureau d'urbanisme calcule un coefficient de corrélation entre le nombre de mètres carrés d'espace vert de chaque arrondissement et le nombre moyen d'heures de promenade des habitant·es de cet arrondissement.\
+Ce résultat est accompagné d'une représentation graphique, un nuage de point.
+
+1.  Combien de points comportera ce nuage ? À quoi correspondent-ils ?
+2.  Si ce coefficient avait été calculé avec le nombre de **kilo**mètres carrés, aurait-il été d'une valeur différente ?
+3.  Quelle valeur prendrait le coefficient si les habitant·es passaient moins de temps à se promener dans les arrondissements où il y a le plus d'espace vert ?
+
+Réponses :
+
+## 3. Régression linéaire
+
+La même métropole cherche à découvrir les déterminants du nombre d'enfants inscrits dans les écoles primaires de la ville. Chaque année, les élèves peuvent uniquement s'inscrire dans l'école qui leur est attribuée en fonction du périmètre scolaire où est situé leur logement (chaque école a une zone géographique de rattachement qui inclut les logements les plus proches d'elle).\
+\
+Elle dispose par ailleurs du registre de l'année précédente, qui renseigne pour chacun des 150 établissements : le nombre d'enfants inscrits, le nombre de ménages dans son périmètre scolaire, la part de couples parmi les ménages de son périmètre scolaire et finalement l'âge moyen des habitant·es de ce même périmètre.
+
+1.  Si l'on construisait un modèle de régression linéaire, quelle(s) serai(en)t le(s) variables explicative(s) et expliquée(s) ? De combien d'observations disposerait-on ?
+2.  Expliquez avec précision ce que permettrait de mesurer le modèle linéaire reliant le nombre d'enfants inscrits et le nombre de ménages.
+3.  Expliquez avec précision ce que permettrait de mesurer le modèle linéaire reliant le nombre d'enfants inscrits et la part de couples.
+4.  Critiquez en jusitifiant le modèle de la sous-question 2. et expliquez comment vous l'amélioreriez.
+
+Réponses :
+
+# Lecture et interprétation
+
+1.  Proposez une lecture de ce tableau.
+
+![](images/declassement.png)
+
+Réponse :
+
+2.  Proposez une lecture de ce tableau.
+
+![](images/competences.png)
+
+Réponse :
+
+3.  Commentez le nuage de points. Proposez une lecture de cette régression linéaire.
+
+![](images/regression.png)
+
+Réponse :
+
+4.  Proposez une lecture de ce modèle de regression logistique.
+
+    ![](images/logistique_intro.jpg)
+
+![](images/logistique.jpg)
+
+Réponse :
+
+# Pratique de R
+
+Lancez ce premier bloc de code qui télécharge une base de données sur les dossiers bancaires de client·es aux États-Unis. **La variable `poids` est la variable de pondération.**
+
+```{r}
+library(tidyverse)
+library(questionr)
+download.file("https://www.statlearning.com/s/Credit.csv", "data/credit.csv")
+
+credit <- read_csv("data/credit.csv")
+credit$poids <- sample(seq(0.001, 10, 0.001), 400, replace = T)
+```
+
+1.  Calculez les effectifs non pondérés de chaque `Region`.
+
+```{r}
+
+```
+
+2.  Calculez les effectifs pondérés de chaque `Region`.
+
+```{r}
+
+```
+
+3.  Calculez la moyenne pondérée de l'âge des client·es.
+
+```{r}
+
+```
+
+4.  Calculez la moyenne pondérée de l'âge des client·es **selon s'ils ou elles sont marié·es.**
+
+```{r}
+
+```
+
+5.  Calculez la variance pondérée de l'âge des client·es **selon s'ils ou elles sont marié·es.**
+
+```{r}
+
+```
+
+6.  Construisez un nuage de points entre le revenu (`Income`) et le score (`Rating`) **en colorant les points selon le statut marital.**
+
+```{r}
+ggplot(credit) +
+  geom_point(
+    aes(x = Income,
+        y = Rating,
+        color = Married)
+  )
+```
+
+7.  Construisez un modèle de régression linéaire qui explique la variation du score bancaire selon le revenu.
+
+```{r}
+
+```
+
+8.  Construisez un modèle de régression linéaire qui explique la variation du score bancaire selon le revenu **indépendamment de la région.**
+
+```{r}
+
+```
+
+9.  Construisez un modèle de régression linéaire qui permet de vérifier **si le lien** entre le score bancaire et le revenu **est le même** chez les personnes mariées ou non mariées.
+
+```{r}
+
+```
+
+10. Construisez un modèle de régression linéaire qui explique la variation du score bancaire en fonction de du revenu **et** du solde (`Balance`)
+
+```{r}
+
+```
