@@ -111,12 +111,7 @@ credit$poids <- sample(seq(0.001, 10, 0.001), 400, replace = T)
 6.  Construisez un nuage de points entre le revenu (`Income`) et le score (`Rating`) **en colorant les points selon le statut marital.**
 
 ```{r}
-ggplot(credit) +
-  geom_point(
-    aes(x = Income,
-        y = Rating,
-        color = Married)
-  )
+
 ```
 
 7.  Construisez un modèle de régression linéaire qui explique la variation du score bancaire selon le revenu.
